@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { Badge, Button, Card, CardHeader, EmptyState } from "@/components/ui";
+import { StaggerChildren } from "@/components/stagger-children";
 import { formatDate, formatNumber } from "@/lib/utils";
 import { FOLLOWUP_PRIORITY_LABELS, FOLLOWUP_PRIORITY_TONES, SEX_LABELS } from "@/lib/labels";
 import { ClipboardList, MessageSquareText, CalendarClock, Activity } from "lucide-react";
@@ -47,7 +48,7 @@ export default async function ClientOverviewPage({
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+    <StaggerChildren stagger={0.06} className="grid grid-cols-1 gap-6 xl:grid-cols-3">
       <div className="space-y-6 xl:col-span-2">
         <Card>
           <CardHeader title="Client details" />
@@ -246,6 +247,6 @@ export default async function ClientOverviewPage({
           </Card>
         ) : null}
       </div>
-    </div>
+    </StaggerChildren>
   );
 }

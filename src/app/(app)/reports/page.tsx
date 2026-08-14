@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Badge, Card, CardHeader, PageHeader } from "@/components/ui";
+import { StaggerChildren } from "@/components/stagger-children";
 import { CLIENT_STATUS_LABELS, GOAL_CATEGORY_LABELS } from "@/lib/labels";
-import { formatNumber } from "@/lib/utils";
 import { subMonths, startOfMonth } from "date-fns";
 
 export const dynamic = "force-dynamic";
@@ -59,7 +59,7 @@ export default async function ReportsPage() {
   const maxMonthCount = Math.max(...sixMonths.map((m) => m.count), 1);
 
   return (
-    <div className="space-y-6">
+    <StaggerChildren stagger={0.05} className="space-y-6">
       <PageHeader title="Reports" description="High-level insights across all clients." />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -161,6 +161,6 @@ export default async function ReportsPage() {
           </div>
         </Card>
       </div>
-    </div>
+    </StaggerChildren>
   );
 }

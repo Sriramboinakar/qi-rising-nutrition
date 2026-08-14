@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { CheckInForm } from "@/components/checkin-form";
 import { Badge, Button } from "@/components/ui";
 import { CHECKIN_STATUS_LABELS, CHECKIN_STATUS_TONES } from "@/lib/labels";
@@ -18,6 +19,7 @@ export function CheckInRow({
   checkIn: SerializedCheckIn;
 }) {
   const [editing, setEditing] = useState(false);
+  const reduced = useReducedMotion();
 
   return (
     <div className="border-b border-stone-100 px-5 py-4 last:border-0">
@@ -57,11 +59,22 @@ export function CheckInRow({
         </p>
       ) : null}
 
-      {editing ? (
-        <div className="mt-4 rounded-xl border border-stone-200 bg-stone-50 p-4">
-          <CheckInForm clientId={clientId} checkIn={checkIn} />
-        </div>
-      ) : null}
+      <AnimatePresence initial={false}>
+        {editing ? (
+          <motion.div
+            key="edit"
+            initial={reduced ? false : { opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={reduced ? undefined : { opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="mt-4 rounded-xl border border-stone-200 bg-stone-50 p-4">
+              <CheckInForm clientId={clientId} checkIn={checkIn} />
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }

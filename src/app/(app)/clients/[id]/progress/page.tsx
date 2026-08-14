@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { ProgressEntryForm, PhotoForm } from "@/components/progress-forms";
 import { LineChart } from "@/components/line-chart";
-import { Card, CardHeader, EmptyState, Badge } from "@/components/ui";
+import { Card, CardHeader, EmptyState } from "@/components/ui";
 import { formatDate, formatNumber } from "@/lib/utils";
 import { PHOTO_TYPE_LABELS } from "@/lib/labels";
 import { Camera, Ruler } from "lucide-react";

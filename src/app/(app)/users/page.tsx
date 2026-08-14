@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { UserForm } from "@/components/user-form";
 import { UserRow } from "@/components/user-row";
 import { Card, CardHeader, PageHeader } from "@/components/ui";
+import { StaggerChildren } from "@/components/stagger-children";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,7 @@ export default async function UsersPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <StaggerChildren stagger={0.05} className="space-y-6">
       <PageHeader title="Users" description="Manage coaches and administrators who access the platform." />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -38,6 +39,6 @@ export default async function UsersPage() {
           </div>
         </Card>
       </div>
-    </div>
+    </StaggerChildren>
   );
 }

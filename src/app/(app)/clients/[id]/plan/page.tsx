@@ -4,8 +4,8 @@ import { PlanForm } from "@/components/plan-form";
 import { PlanActions } from "@/components/plan-actions";
 import { Badge, Card, CardHeader, EmptyState } from "@/components/ui";
 import { PLAN_STATUS_LABELS, PLAN_STATUS_TONES } from "@/lib/labels";
-import { formatDate, formatNumber } from "@/lib/utils";
-import { ClipboardList, Plus } from "lucide-react";
+import { formatDate } from "@/lib/utils";
+import { ClipboardList } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 

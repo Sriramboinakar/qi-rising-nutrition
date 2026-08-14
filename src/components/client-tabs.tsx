@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export const CLIENT_TABS = [
@@ -17,6 +18,7 @@ export const CLIENT_TABS = [
 
 export function ClientTabs({ clientId }: { clientId: string }) {
   const pathname = usePathname();
+  const reduced = useReducedMotion();
   const base = `/clients/${clientId}`;
 
   return (
@@ -28,11 +30,18 @@ export function ClientTabs({ clientId }: { clientId: string }) {
             key={tab.href}
             href={`${base}${tab.href}`}
             className={cn(
-              "whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
-              active ? "bg-stone-900 text-white" : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
+              "relative whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+              active ? "text-white" : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
             )}
           >
-            {tab.label}
+            {active && !reduced ? (
+              <motion.span
+                layoutId={`client-tab-${clientId}`}
+                className="absolute inset-0 rounded-lg bg-stone-900"
+                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+              />
+            ) : null}
+            <span className="relative z-10">{tab.label}</span>
           </Link>
         );
       })}

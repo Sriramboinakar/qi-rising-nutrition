@@ -13,22 +13,23 @@ export function Button({
 }) {
   const variants = {
     primary:
-      "bg-brand-600 text-white hover:bg-brand-700 focus-visible:ring-brand-600",
+      "bg-brand-600 text-white shadow-sm shadow-brand-600/20 hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 focus-visible:ring-brand-600 active:scale-[0.98]",
     secondary:
-      "bg-stone-900 text-white hover:bg-stone-800 focus-visible:ring-stone-900",
-    ghost: "bg-transparent text-stone-600 hover:bg-stone-100",
-    danger: "bg-red-600 text-white hover:bg-red-700",
+      "bg-stone-900 text-white shadow-sm hover:bg-stone-800 focus-visible:ring-stone-900 active:scale-[0.98]",
+    ghost: "bg-transparent text-stone-600 hover:bg-stone-100 hover:text-stone-900",
+    danger:
+      "bg-red-600 text-white shadow-sm shadow-red-600/20 hover:bg-red-700 focus-visible:ring-red-600 active:scale-[0.98]",
     outline:
-      "bg-white text-stone-700 border border-stone-300 hover:bg-stone-50",
+      "bg-white text-stone-700 border border-stone-300 hover:border-stone-400 hover:bg-stone-50 focus-visible:ring-stone-400 active:scale-[0.98]",
   };
   const sizes = {
-    sm: "h-8 px-3 text-xs",
-    md: "h-10 px-4 text-sm",
+    sm: "h-8 px-3 text-xs gap-1.5",
+    md: "h-10 px-4 text-sm gap-2",
   };
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none cursor-pointer",
+        "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer",
         variants[variant],
         sizes[size],
         className
@@ -47,11 +48,15 @@ export function Label({ children, htmlFor, className }: { children: ReactNode; h
   );
 }
 
+const inputBase =
+  "h-10 w-full rounded-lg border bg-white px-3 text-sm text-stone-900 placeholder:text-stone-400 shadow-sm transition-all duration-150 focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed";
+
 export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       className={cn(
-        "h-10 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm text-stone-900 placeholder:text-stone-400 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20",
+        inputBase,
+        "border-stone-300 focus:border-brand-600 focus:ring-brand-600/20 hover:border-stone-400",
         className
       )}
       {...props}
@@ -63,7 +68,8 @@ export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTex
   return (
     <textarea
       className={cn(
-        "w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20",
+        inputBase,
+        "h-auto min-h-[96px] py-2 border-stone-300 focus:border-brand-600 focus:ring-brand-600/20 hover:border-stone-400",
         className
       )}
       {...props}
@@ -75,7 +81,8 @@ export function Select({ className, children, ...props }: SelectHTMLAttributes<H
   return (
     <select
       className={cn(
-        "h-10 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm text-stone-900 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 cursor-pointer",
+        inputBase,
+        "cursor-pointer border-stone-300 focus:border-brand-600 focus:ring-brand-600/20 hover:border-stone-400",
         className
       )}
       {...props}
@@ -111,11 +118,11 @@ export function CardHeader({
 }) {
   return (
     <div className="flex items-start justify-between gap-4 border-b border-stone-100 px-5 py-4">
-      <div>
-        <h3 className="text-sm font-semibold text-stone-900">{title}</h3>
+      <div className="min-w-0">
+        <h3 className="text-sm font-semibold tracking-tight text-stone-900">{title}</h3>
         {subtitle ? <p className="mt-0.5 text-xs text-stone-500">{subtitle}</p> : null}
       </div>
-      {action}
+      {action ? <div className="shrink-0">{action}</div> : null}
     </div>
   );
 }
@@ -138,14 +145,23 @@ export function Badge({
     blue: "bg-blue-50 text-blue-700",
     violet: "bg-violet-50 text-violet-700",
   };
+  const dots = {
+    neutral: "bg-stone-400",
+    green: "bg-emerald-500",
+    amber: "bg-amber-500",
+    red: "bg-red-500",
+    blue: "bg-blue-500",
+    violet: "bg-violet-500",
+  };
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium",
         tones[tone],
         className
       )}
     >
+      <span className={cn("h-1.5 w-1.5 rounded-full", dots[tone])} aria-hidden="true" />
       {children}
     </span>
   );
@@ -164,10 +180,10 @@ export function PageHeader({
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-stone-900">{title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">{title}</h1>
         {description ? <p className="mt-1 text-sm text-stone-500">{description}</p> : null}
       </div>
-      {action}
+      {action ? <div className="shrink-0">{action}</div> : null}
     </div>
   );
 }

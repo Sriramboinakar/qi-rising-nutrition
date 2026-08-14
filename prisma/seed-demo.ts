@@ -53,7 +53,7 @@ async function main() {
     },
   });
 
-  const plan = await prisma.nutritionPlan.create({
+  await prisma.nutritionPlan.create({
     data: {
       clientId: client.id,
       name: "Phase 1 — Cut",

@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { createFollowUp, completeFollowUp, deleteFollowUp } from "@/lib/actions/followups";
-import { Badge, Button, Card, CardHeader, EmptyState, Input, Label, Select, Textarea } from "@/components/ui";
+import { Badge, Button, Card, CardHeader, Input, Label, Select } from "@/components/ui";
 import { FOLLOWUP_PRIORITY_LABELS, FOLLOWUP_PRIORITY_TONES, FOLLOWUP_STATUS_LABELS, FOLLOWUP_STATUS_TONES } from "@/lib/labels";
 import { formatDate } from "@/lib/utils";
-import { BellRing, Check, Trash2 } from "lucide-react";
+import { Check, Trash2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
-import { createHabit, deleteHabit, toggleHabitLog } from "@/lib/actions/habits";
+import { createHabit, toggleHabitLog } from "@/lib/actions/habits";
 import { Button, Card, CardHeader, EmptyState, Input, Label, Select } from "@/components/ui";
 import { HABIT_FREQUENCY_LABELS } from "@/lib/labels";
 import { CheckCircle2, Repeat } from "lucide-react";

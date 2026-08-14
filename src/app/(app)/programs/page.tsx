@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/db";
 import { ProgramForm } from "@/components/program-form";
-import { Badge, Button, Card, CardHeader, PageHeader } from "@/components/ui";
-import { CalendarRange, Plus } from "lucide-react";
+import { Badge, Card, CardHeader, PageHeader } from "@/components/ui";
+import { StaggerChildren } from "@/components/stagger-children";
+import { CalendarRange } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,7 @@ export default async function ProgramsPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <StaggerChildren stagger={0.05} className="space-y-6">
       <PageHeader title="Programs" description="Manage the coaching programs offered to clients." />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -45,6 +46,6 @@ export default async function ProgramsPage() {
           </Card>
         ))}
       </div>
-    </div>
+    </StaggerChildren>
   );
 }

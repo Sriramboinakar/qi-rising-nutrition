@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Badge, Button, Card, EmptyState, Input, PageHeader, Select } from "@/components/ui";
+import { StaggerChildren } from "@/components/stagger-children";
 import { CLIENT_STATUS_LABELS, CLIENT_STATUS_TONES, GOAL_CATEGORY_LABELS } from "@/lib/labels";
 import { fullName, initials, formatDate } from "@/lib/utils";
 import { Plus, Search, UserRound } from "lucide-react";
@@ -21,7 +22,7 @@ export default async function ClientsPage({ searchParams }: Props) {
   const status = params.status ?? "";
   const category = params.category ?? "";
 
-  const [clients, programs] = await Promise.all([
+  const [clients] = await Promise.all([
     prisma.client.findMany({
       where: {
         ...(q
@@ -43,11 +44,10 @@ export default async function ClientsPage({ searchParams }: Props) {
       },
       orderBy: { createdAt: "desc" },
     }),
-    prisma.program.findMany({ orderBy: { name: "asc" } }),
   ]);
 
   return (
-    <div className="space-y-6">
+    <StaggerChildren stagger={0.04} className="space-y-6">
       <PageHeader
         title="Clients"
         description={`${clients.length} client${clients.length === 1 ? "" : "s"}`}
@@ -149,6 +149,6 @@ export default async function ClientsPage({ searchParams }: Props) {
           </div>
         </Card>
       )}
-    </div>
+    </StaggerChildren>
   );
 }

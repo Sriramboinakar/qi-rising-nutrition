@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { getDashboardData } from "@/lib/queries/dashboard";
 import { Badge, Button, Card, CardHeader, EmptyState, PageHeader } from "@/components/ui";
+import { StaggerChildren } from "@/components/stagger-children";
 import { formatDate } from "@/lib/utils";
 import {
   Users,
@@ -21,7 +22,7 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user) return null;
 
-  const data = await getDashboardData(session.user.id, session.user.role === "SUPER_ADMIN");
+  const data = await getDashboardData();
 
   const stats = [
     {
@@ -52,26 +53,27 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        title={`Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}, ${session.user.name?.split(" ")[0] ?? "Coach"}`}
-        description="Here is what needs your attention today."
-      />
+      <StaggerChildren stagger={0.05}>
+        <PageHeader
+          title={`Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}, ${session.user.name?.split(" ")[0] ?? "Coach"}`}
+          description="Here is what needs your attention today."
+        />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.label} className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-stone-500">{stat.label}</p>
-                <p className="mt-1 text-3xl font-semibold text-stone-900">{stat.value}</p>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <Card key={stat.label} className="p-5 transition-shadow duration-200 hover:shadow-md">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-stone-500">{stat.label}</p>
+                  <p className="mt-1 text-3xl font-semibold tracking-tight text-stone-900">{stat.value}</p>
+                </div>
+                <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${stat.accent}`}>
+                  <stat.icon className="h-5 w-5" />
+                </div>
               </div>
-              <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${stat.accent}`}>
-                <stat.icon className="h-5 w-5" />
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
@@ -101,7 +103,7 @@ export default async function DashboardPage() {
                   <Link
                     key={`${item.clientId}-${item.reason}`}
                     href={`/clients/${item.clientId}`}
-                    className="flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-stone-50"
+                    className="group flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-stone-50"
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
@@ -114,7 +116,7 @@ export default async function DashboardPage() {
                       <span className="hidden text-xs font-medium text-brand-700 sm:inline">
                         {item.action}
                       </span>
-                      <ArrowUpRight className="h-4 w-4 text-stone-300" />
+                      <ArrowUpRight className="h-4 w-4 text-stone-300 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </div>
                   </Link>
                 ))
@@ -171,6 +173,7 @@ export default async function DashboardPage() {
           </Card>
         </div>
       </div>
+      </StaggerChildren>
     </div>
   );
 }

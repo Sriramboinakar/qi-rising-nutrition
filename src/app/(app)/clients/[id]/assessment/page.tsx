@@ -1,11 +1,10 @@
-import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { AssessmentForm } from "@/components/assessment-form";
-import { Badge, Button, Card, CardHeader, EmptyState } from "@/components/ui";
+import { Badge, Card, CardHeader, EmptyState } from "@/components/ui";
 import { formatDate, formatNumber } from "@/lib/utils";
 import { ASSESSMENT_TYPE_LABELS } from "@/lib/labels";
-import { ClipboardList, Plus } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 

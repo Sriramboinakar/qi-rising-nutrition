@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { startOfDay, endOfDay, subDays, addDays } from "date-fns";
 
-export async function getDashboardData(userId: string, isAdmin: boolean) {
+export async function getDashboardData() {
   const today = new Date();
 
   const [activeCount, openFollowUps, overdueFollowUps, recentActivity, attention, upcoming] =
@@ -16,7 +16,7 @@ export async function getDashboardData(userId: string, isAdmin: boolean) {
         take: 20,
         include: { client: { select: { id: true, firstName: true, lastName: true } } },
       }),
-      buildAttentionQueue(userId),
+      buildAttentionQueue(),
       prisma.followUp.findMany({
         where: {
           status: "OPEN",
@@ -44,7 +44,7 @@ type AttentionItem = {
   action: string;
 };
 
-async function buildAttentionQueue(userId: string): Promise<AttentionItem[]> {
+async function buildAttentionQueue(): Promise<AttentionItem[]> {
   const today = new Date();
   const weekAgo = subDays(today, 7);
   const in30Days = addDays(today, 30);

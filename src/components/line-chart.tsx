@@ -1,9 +1,14 @@
 "use client";
 
+import { motion, useReducedMotion } from "motion/react";
+import { useId } from "react";
+
 type Point = { label: string; value: number };
 
 export function LineChart({ points, height = 180 }: { points: Point[]; height?: number }) {
   const width = 600;
+  const gradientId = useId().replace(/:/g, "");
+  const reduced = useReducedMotion();
 
   if (points.length < 2) {
     return (
@@ -36,20 +41,41 @@ export function LineChart({ points, height = 180 }: { points: Point[]; height?: 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full" role="img" aria-label="Trend chart">
       <defs>
-        <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`chart-fill-${gradientId}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#10b981" stopOpacity="0.2" />
           <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path d={area} fill="url(#chart-fill)" />
-      <path d={line} fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <motion.path
+        d={area}
+        fill={`url(#chart-fill-${gradientId})`}
+        initial={reduced ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+      />
+      <motion.path
+        d={line}
+        fill="none"
+        stroke="#059669"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={reduced ? false : { pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.9, ease: "easeInOut" }}
+      />
       {coords.map((c, i) => (
-        <g key={i}>
+        <motion.g
+          key={i}
+          initial={reduced ? false : { opacity: 0, scale: 0.6 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5 + i * 0.08, duration: 0.25, ease: "backOut" }}
+        >
           <circle cx={c.x} cy={c.y} r="3.5" fill="#fff" stroke="#059669" strokeWidth="2" />
           <text x={c.x} y={c.y - 10} textAnchor="middle" fontSize="10" fill="#78716c">
             {points[i].value}
           </text>
-        </g>
+        </motion.g>
       ))}
       {points.map((p, i) => (
         <text
