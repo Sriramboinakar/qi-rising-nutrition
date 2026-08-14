@@ -52,9 +52,8 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-8">
-      <StaggerChildren stagger={0.05}>
-        <PageHeader
+    <StaggerChildren stagger={0.05} className="space-y-8">
+      <PageHeader
           title={`Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}, ${session.user.name?.split(" ")[0] ?? "Coach"}`}
           description="Here is what needs your attention today."
         />
@@ -173,7 +172,6 @@ export default async function DashboardPage() {
           </Card>
         </div>
       </div>
-      </StaggerChildren>
-    </div>
+    </StaggerChildren>
   );
 }
