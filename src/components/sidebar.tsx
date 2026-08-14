@@ -36,6 +36,61 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/users", label: "Users", icon: UserCog, adminOnly: true },
 ];
 
+function NavLink({
+  item,
+  active,
+  onNavigate,
+}: {
+  item: NavItem;
+  active: boolean;
+  onNavigate?: () => void;
+}) {
+  const reduced = useReducedMotion();
+
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      className={cn(
+        "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150",
+        active ? "text-white" : "text-sidebar-fg hover:text-white"
+      )}
+    >
+      {active && !reduced ? (
+        <motion.span
+          layoutId="sidebar-active-pill"
+          className="absolute inset-0 rounded-lg bg-brand-600/20 ring-1 ring-inset ring-brand-500/30"
+          transition={{ type: "spring", stiffness: 450, damping: 34 }}
+        />
+      ) : null}
+
+      <motion.span
+        className="relative z-10 flex items-center gap-3"
+        whileTap={reduced ? undefined : { scale: 0.96 }}
+      >
+        <item.icon
+          className={cn(
+            "h-4 w-4 shrink-0 transition-all duration-200",
+            active
+              ? "text-brand-400"
+              : "text-sidebar-fg group-hover:text-white group-hover:scale-110"
+          )}
+        />
+        <span className="relative">
+          {item.label}
+          {active ? (
+            <motion.span
+              layoutId="sidebar-active-dot"
+              className="absolute -right-3 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-brand-400"
+              transition={{ type: "spring", stiffness: 450, damping: 34 }}
+            />
+          ) : null}
+        </span>
+      </motion.span>
+    </Link>
+  );
+}
+
 function SidebarContent({
   name,
   email,
@@ -48,15 +103,18 @@ function SidebarContent({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
-  const reduced = useReducedMotion();
   const items = NAV_ITEMS.filter((item) => !item.adminOnly || role === "SUPER_ADMIN");
 
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 shadow-md shadow-brand-600/30">
+        <motion.div
+          className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 shadow-md shadow-brand-600/30"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           <Leaf className="h-5 w-5 text-white" />
-        </div>
+        </motion.div>
         <div className="leading-tight">
           <p className="text-sm font-semibold text-white">Qi Rising</p>
           <p className="text-[11px] text-sidebar-fg">Nutrition</p>
@@ -65,29 +123,9 @@ function SidebarContent({
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
         {items.map((item) => {
-          const active = pathname.startsWith(item.href);
+          const active = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className={cn(
-                "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                active
-                  ? "bg-brand-600/15 text-sidebar-active"
-                  : "text-sidebar-fg hover:bg-white/5 hover:text-white"
-              )}
-            >
-              {active && !reduced ? (
-                <motion.span
-                  layoutId="sidebar-active"
-                  className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-brand-400"
-                  transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                />
-              ) : null}
-              <item.icon className="h-4 w-4 shrink-0 transition-transform duration-150 group-hover:scale-110" />
-              {item.label}
-            </Link>
+            <NavLink key={item.href} item={item} active={active} onNavigate={onNavigate} />
           );
         })}
       </nav>
@@ -105,7 +143,7 @@ function SidebarContent({
         <form action={logoutAction}>
           <button
             type="submit"
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-fg transition-colors hover:bg-white/5 hover:text-white cursor-pointer"
+            className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-fg transition-colors hover:bg-white/5 hover:text-white"
           >
             <LogOut className="h-4 w-4 shrink-0" />
             Sign out

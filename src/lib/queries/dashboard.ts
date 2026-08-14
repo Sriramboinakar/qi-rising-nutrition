@@ -1,39 +1,43 @@
+import { cache } from "react";
 import { prisma } from "@/lib/db";
 import { startOfDay, endOfDay, subDays, addDays } from "date-fns";
 
-export async function getDashboardData() {
-  const today = new Date();
+export async function getDashboardStats() {
+  const [activeCount, openFollowUps, overdueFollowUps] = await Promise.all([
+    prisma.client.count({ where: { status: "ACTIVE" } }),
+    prisma.followUp.count({ where: { status: "OPEN" } }),
+    prisma.followUp.count({
+      where: { status: "OPEN", dueDate: { lt: startOfDay(new Date()) } },
+    }),
+  ]);
 
-  const [activeCount, openFollowUps, overdueFollowUps, recentActivity, attention, upcoming] =
-    await Promise.all([
-      prisma.client.count({ where: { status: "ACTIVE" } }),
-      prisma.followUp.count({ where: { status: "OPEN" } }),
-      prisma.followUp.count({
-        where: { status: "OPEN", dueDate: { lt: startOfDay(today) } },
-      }),
-      prisma.activity.findMany({
-        orderBy: { createdAt: "desc" },
-        take: 20,
-        include: { client: { select: { id: true, firstName: true, lastName: true } } },
-      }),
-      buildAttentionQueue(),
-      prisma.followUp.findMany({
-        where: {
-          status: "OPEN",
-          dueDate: { gte: startOfDay(today), lte: endOfDay(addDays(today, 7)) },
-        },
-        orderBy: { dueDate: "asc" },
-        include: { client: { select: { id: true, firstName: true, lastName: true } } },
-      }),
-    ]);
-
-  return {
-    stats: { activeCount, openFollowUps, overdueFollowUps },
-    recentActivity,
-    attention,
-    upcoming,
-  };
+  return { activeCount, openFollowUps, overdueFollowUps };
 }
+
+export const getDashboardAttention = cache(async () => {
+  return buildAttentionQueue();
+});
+
+export const getDashboardUpcoming = cache(async () => {
+  const today = new Date();
+  const [recentActivity, upcoming] = await Promise.all([
+    prisma.activity.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      include: { client: { select: { id: true, firstName: true, lastName: true } } },
+    }),
+    prisma.followUp.findMany({
+      where: {
+        status: "OPEN",
+        dueDate: { gte: startOfDay(today), lte: endOfDay(addDays(today, 7)) },
+      },
+      orderBy: { dueDate: "asc" },
+      include: { client: { select: { id: true, firstName: true, lastName: true } } },
+    }),
+  ]);
+
+  return { recentActivity, upcoming };
+});
 
 type AttentionItem = {
   clientId: string;
