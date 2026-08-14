@@ -16,7 +16,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         email={session.user.email ?? ""}
         role={session.user.role}
       />
-      <main className="min-w-0 flex-1 overflow-x-hidden px-8 py-8">{children}</main>
+      <main className="min-w-0 flex-1 overflow-x-hidden px-4 py-4 pt-20 sm:px-6 sm:py-8 lg:pt-8">
+        {children}
+      </main>
     </div>
   );
 }
