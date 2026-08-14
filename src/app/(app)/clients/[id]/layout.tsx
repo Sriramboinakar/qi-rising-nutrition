@@ -17,7 +17,15 @@ export default async function ClientLayout({
   const { id } = await params;
   const client = await prisma.client.findUnique({
     where: { id },
-    include: { program: true },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      category: true,
+      status: true,
+      programStartDate: true,
+      program: { select: { name: true } },
+    },
   });
 
   if (!client) notFound();

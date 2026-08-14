@@ -56,14 +56,23 @@ async function buildAttentionQueue(): Promise<AttentionItem[]> {
 
   const clients = await prisma.client.findMany({
     where: { status: "ACTIVE" },
-    include: {
-      assessments: { orderBy: { date: "desc" }, take: 1 },
-      checkIns: { orderBy: { checkInDate: "desc" }, take: 1 },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      programEndDate: true,
+      program: { select: { name: true } },
+      assessments: { select: { id: true }, orderBy: { date: "desc" }, take: 1 },
+      checkIns: {
+        select: { checkInDate: true, adherencePct: true },
+        orderBy: { checkInDate: "desc" },
+        take: 1,
+      },
       followUps: {
         where: { status: "OPEN" },
+        select: { title: true, dueDate: true },
         orderBy: { dueDate: "asc" },
       },
-      program: true,
     },
   });
 

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { Badge, Card, CardHeader, PageHeader } from "@/components/ui";
 import { StaggerChildren } from "@/components/stagger-children";
 import { Skeleton } from "@/components/skeleton";
+import { CountUp } from "@/components/count-up";
 import { CLIENT_STATUS_LABELS, GOAL_CATEGORY_LABELS } from "@/lib/labels";
 import { subMonths, startOfMonth } from "date-fns";
 
@@ -25,11 +26,11 @@ export default async function ReportsPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="p-5 transition-shadow duration-200 hover:shadow-md">
           <p className="text-sm text-stone-500">Total clients</p>
-          <p className="mt-1 text-3xl font-semibold tracking-tight text-stone-900">{totalClients}</p>
+          <CountUp value={totalClients} className="mt-1 inline-block text-3xl font-semibold tracking-tight text-stone-900 tabular-nums" />
         </Card>
         <Card className="p-5 transition-shadow duration-200 hover:shadow-md">
           <p className="text-sm text-stone-500">Active clients</p>
-          <p className="mt-1 text-3xl font-semibold tracking-tight text-stone-900">{activeCount}</p>
+          <CountUp value={activeCount} className="mt-1 inline-block text-3xl font-semibold tracking-tight text-stone-900 tabular-nums" />
         </Card>
         <Suspense
           fallback={
@@ -43,7 +44,7 @@ export default async function ReportsPage() {
         </Suspense>
         <Card className="p-5 transition-shadow duration-200 hover:shadow-md">
           <p className="text-sm text-stone-500">Overdue follow-ups</p>
-          <p className="mt-1 text-3xl font-semibold tracking-tight text-stone-900">{overdueCount}</p>
+          <CountUp value={overdueCount} className="mt-1 inline-block text-3xl font-semibold tracking-tight text-stone-900 tabular-nums" />
         </Card>
       </div>
 

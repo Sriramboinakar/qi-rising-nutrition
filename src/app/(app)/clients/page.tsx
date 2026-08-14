@@ -22,29 +22,32 @@ export default async function ClientsPage({ searchParams }: Props) {
   const status = params.status ?? "";
   const category = params.category ?? "";
 
-  const [clients] = await Promise.all([
-    prisma.client.findMany({
-      where: {
-        ...(q
-          ? {
-              OR: [
-                { firstName: { contains: q, mode: "insensitive" } },
-                { lastName: { contains: q, mode: "insensitive" } },
-                { email: { contains: q, mode: "insensitive" } },
-              ],
-            }
-          : {}),
-        ...(status ? { status: status as never } : {}),
-        ...(category ? { category: category as never } : {}),
-      },
-      include: {
-        program: true,
-        assessments: { orderBy: { date: "desc" }, take: 1 },
-        checkIns: { orderBy: { checkInDate: "desc" }, take: 1 },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-  ]);
+  const clients = await prisma.client.findMany({
+    where: {
+      ...(q
+        ? {
+            OR: [
+              { firstName: { contains: q, mode: "insensitive" } },
+              { lastName: { contains: q, mode: "insensitive" } },
+              { email: { contains: q, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+      ...(status ? { status: status as never } : {}),
+      ...(category ? { category: category as never } : {}),
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      category: true,
+      status: true,
+      program: { select: { name: true } },
+      checkIns: { select: { checkInDate: true }, orderBy: { checkInDate: "desc" }, take: 1 },
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
   return (
     <StaggerChildren stagger={0.04} className="space-y-6">

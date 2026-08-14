@@ -9,6 +9,7 @@ import {
 import { Badge, Button, Card, CardHeader, EmptyState, PageHeader } from "@/components/ui";
 import { StaggerChildren } from "@/components/stagger-children";
 import { Skeleton } from "@/components/skeleton";
+import { CountUp } from "@/components/count-up";
 import { formatDate } from "@/lib/utils";
 import {
   Users,
@@ -64,7 +65,10 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-stone-500">{stat.label}</p>
-                <p className="mt-1 text-3xl font-semibold tracking-tight text-stone-900">{stat.value}</p>
+                <CountUp
+                  value={stat.value}
+                  className="mt-1 inline-block text-3xl font-semibold tracking-tight text-stone-900 tabular-nums"
+                />
               </div>
               <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${stat.accent}`}>
                 <stat.icon className="h-5 w-5" />
@@ -120,7 +124,10 @@ async function AttentionCountCard() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-stone-500">Needs attention</p>
-          <p className="mt-1 text-3xl font-semibold tracking-tight text-stone-900">{attention.length}</p>
+          <CountUp
+            value={attention.length}
+            className="mt-1 inline-block text-3xl font-semibold tracking-tight text-stone-900 tabular-nums"
+          />
         </div>
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
           <Activity className="h-5 w-5" />
