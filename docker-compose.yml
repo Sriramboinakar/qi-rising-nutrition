@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: qi-rising-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: qirising
+      POSTGRES_PASSWORD: qirising
+      POSTGRES_DB: qirising
+    ports:
+      - "5433:5432"
+    volumes:
+      - qirising_pgdata:/var/lib/postgresql/data
+
+volumes:
+  qirising_pgdata:

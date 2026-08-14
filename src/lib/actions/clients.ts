@@ -1,0 +1,100 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { prisma } from "@/lib/db";
+import { auth } from "@/auth";
+import type { ClientStatus, GoalCategory } from "@/generated/prisma/enums";
+import { logActivity } from "@/lib/activity";
+
+export async function createClient(formData: FormData) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Not authenticated");
+
+  const firstName = String(formData.get("firstName") ?? "").trim();
+  const lastName = String(formData.get("lastName") ?? "").trim();
+  if (!firstName || !lastName) return { error: "First and last name are required." };
+
+  const email = String(formData.get("email") ?? "").trim() || null;
+  if (email) {
+    const existing = await prisma.client.findUnique({ where: { email } });
+    if (existing) return { error: "A client with this email already exists." };
+  }
+
+  const category = (String(formData.get("category") ?? "") || "FAT_LOSS") as GoalCategory;
+  const programId = String(formData.get("programId") ?? "") || null;
+  const startDate = String(formData.get("programStartDate") ?? "");
+  const endDate = String(formData.get("programEndDate") ?? "");
+
+  const client = await prisma.client.create({
+    data: {
+      firstName,
+      lastName,
+      email,
+      phone: String(formData.get("phone") ?? "") || null,
+      sex: String(formData.get("sex") ?? "") || null,
+      category,
+      coachId: session.user.id,
+      programId,
+      programStartDate: startDate ? new Date(startDate) : null,
+      programEndDate: endDate ? new Date(endDate) : null,
+      notes: String(formData.get("notes") ?? "") || null,
+    },
+  });
+
+  await logActivity(session.user.id, client.id, "client.created", `Created client ${client.firstName} ${client.lastName}`);
+
+  revalidatePath("/clients");
+  return { id: client.id };
+}
+
+export async function updateClient(clientId: string, formData: FormData) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Not authenticated");
+
+  const firstName = String(formData.get("firstName") ?? "").trim();
+  const lastName = String(formData.get("lastName") ?? "").trim();
+  if (!firstName || !lastName) return { error: "First and last name are required." };
+
+  const email = String(formData.get("email") ?? "").trim() || null;
+  const category = (String(formData.get("category") ?? "") || "FAT_LOSS") as GoalCategory;
+  const status = (String(formData.get("status") ?? "") || "ACTIVE") as ClientStatus;
+  const programId = String(formData.get("programId") ?? "") || null;
+  const startDate = String(formData.get("programStartDate") ?? "");
+  const endDate = String(formData.get("programEndDate") ?? "");
+
+  await prisma.client.update({
+    where: { id: clientId },
+    data: {
+      firstName,
+      lastName,
+      email,
+      phone: String(formData.get("phone") ?? "") || null,
+      sex: String(formData.get("sex") ?? "") || null,
+      category,
+      status,
+      programId,
+      programStartDate: startDate ? new Date(startDate) : null,
+      programEndDate: endDate ? new Date(endDate) : null,
+      notes: String(formData.get("notes") ?? "") || null,
+    },
+  });
+
+  await logActivity(session.user.id, clientId, "client.updated", `Updated ${firstName} ${lastName}'s profile`);
+  revalidatePath(`/clients/${clientId}`);
+  revalidatePath("/clients");
+  revalidatePath("/dashboard");
+}
+
+export async function setClientStatus(clientId: string, status: ClientStatus) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Not authenticated");
+
+  await prisma.client.update({
+    where: { id: clientId },
+    data: { status },
+  });
+
+  await logActivity(session.user.id, clientId, "client.status", `Marked client as ${status.toLowerCase()}`);
+  revalidatePath(`/clients/${clientId}`);
+  revalidatePath("/dashboard");
+}
