@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import type { ClientStatus, GoalCategory } from "@/generated/prisma/enums";
 import { logActivity } from "@/lib/activity";
+import { parseDateInput } from "@/lib/utils";
 
 export async function createClient(formData: FormData) {
   const session = await auth();
@@ -35,8 +36,8 @@ export async function createClient(formData: FormData) {
       category,
       coachId: session.user.id,
       programId,
-      programStartDate: startDate ? new Date(startDate) : null,
-      programEndDate: endDate ? new Date(endDate) : null,
+      programStartDate: parseDateInput(startDate),
+      programEndDate: parseDateInput(endDate),
       notes: String(formData.get("notes") ?? "") || null,
     },
   });
@@ -73,8 +74,8 @@ export async function updateClient(clientId: string, formData: FormData) {
       category,
       status,
       programId,
-      programStartDate: startDate ? new Date(startDate) : null,
-      programEndDate: endDate ? new Date(endDate) : null,
+      programStartDate: parseDateInput(startDate),
+      programEndDate: parseDateInput(endDate),
       notes: String(formData.get("notes") ?? "") || null,
     },
   });

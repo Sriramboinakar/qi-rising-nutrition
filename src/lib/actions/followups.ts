@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { logActivity } from "@/lib/activity";
+import { parseDateInput } from "@/lib/utils";
 import type { FollowUpPriority } from "@/generated/prisma/enums";
 
 export async function createFollowUp(clientId: string, formData: FormData) {
@@ -17,13 +18,16 @@ export async function createFollowUp(clientId: string, formData: FormData) {
 
   const priority = (String(formData.get("priority") ?? "") || "MEDIUM") as FollowUpPriority;
 
+  const parsedDueDate = parseDateInput(dueDate);
+  if (!parsedDueDate) return { error: "Due date is invalid." };
+
   await prisma.followUp.create({
     data: {
       clientId,
       authorId: session.user.id,
       title,
       description: String(formData.get("description") ?? "") || null,
-      dueDate: new Date(dueDate),
+      dueDate: parsedDueDate,
       priority,
     },
   });

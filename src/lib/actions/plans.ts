@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { logActivity } from "@/lib/activity";
+import { parseDateInput } from "@/lib/utils";
 import type { PlanStatus } from "@/generated/prisma/enums";
 
 function num(name: string, formData: FormData): number | null {
@@ -50,8 +51,8 @@ export async function createPlan(clientId: string, formData: FormData) {
       carbsG: num("carbsG", formData),
       fatG: num("fatG", formData),
       waterLiters: num("waterLiters", formData),
-      startDate: startDate ? new Date(startDate) : null,
-      endDate: endDate ? new Date(endDate) : null,
+      startDate: parseDateInput(startDate),
+      endDate: parseDateInput(endDate),
       supplements: String(formData.get("supplements") ?? "") || null,
       notes: String(formData.get("notes") ?? "") || null,
       meals: { create: meals },

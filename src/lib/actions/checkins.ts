@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { logActivity } from "@/lib/activity";
+import { parseDateInput } from "@/lib/utils";
 import type { CheckInStatus } from "@/generated/prisma/enums";
 
 function num(name: string, formData: FormData): number | null {
@@ -29,7 +30,7 @@ export async function createCheckIn(clientId: string, formData: FormData) {
       clientId,
       weekNumber,
       status,
-      checkInDate: formData.get("date") ? new Date(String(formData.get("date"))) : new Date(),
+      checkInDate: parseDateInput(formData.get("date")) ?? new Date(),
       weightKg: num("weightKg", formData),
       waistCm: num("waistCm", formData),
       sleepHours: num("sleepHours", formData),
@@ -39,7 +40,7 @@ export async function createCheckIn(clientId: string, formData: FormData) {
       waterLiters: num("waterLiters", formData),
       notes: String(formData.get("notes") ?? "") || null,
       response: String(formData.get("response") ?? "") || null,
-      followUpDate: followUpDate ? new Date(followUpDate) : null,
+      followUpDate: parseDateInput(followUpDate),
       // Coach-recorded check-ins are reviewed by the act of entering them.
       reviewedAt: new Date(),
     },
@@ -76,7 +77,7 @@ export async function updateCheckIn(clientId: string, checkInId: string, formDat
       waterLiters: num("waterLiters", formData),
       notes: String(formData.get("notes") ?? "") || null,
       response: String(formData.get("response") ?? "") || null,
-      followUpDate: followUpDate ? new Date(followUpDate) : null,
+      followUpDate: parseDateInput(followUpDate),
       // Editing a check-in counts as reviewing it (for client-submitted ones).
       reviewedAt: new Date(),
     },

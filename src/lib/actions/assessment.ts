@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { logActivity } from "@/lib/activity";
+import { parseDateInput } from "@/lib/utils";
 import type { AssessmentType } from "@/generated/prisma/enums";
 
 function num(name: string, formData: FormData): number | null {
@@ -21,7 +22,7 @@ export async function createAssessment(clientId: string, formData: FormData) {
     data: {
       clientId,
       type,
-      date: formData.get("date") ? new Date(String(formData.get("date"))) : new Date(),
+      date: parseDateInput(formData.get("date")) ?? new Date(),
       weightKg: num("weightKg", formData),
       goalWeightKg: num("goalWeightKg", formData),
       heightCm: num("heightCm", formData),

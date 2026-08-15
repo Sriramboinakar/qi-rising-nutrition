@@ -27,13 +27,7 @@ export default async function IntakePage({ params }: { params: Promise<{ token: 
       title="Welcome to Qi Rising"
       subtitle="Complete your intake so your coach can personalise your nutrition plan."
     >
-      {client.intakeSubmittedAt ? (
-        <div className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800">
-          Your intake has already been submitted. If you need to make changes, please contact your coach.
-        </div>
-      ) : (
-        <IntakeForm token={token} clientName={client.firstName} />
-      )}
+      <IntakeForm token={token} clientName={client.firstName} alreadySubmitted={Boolean(client.intakeSubmittedAt)} />
     </ClientPortalShell>
   );
 }

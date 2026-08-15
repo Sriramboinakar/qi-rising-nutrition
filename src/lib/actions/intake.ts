@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { issueAccessToken, resolveAccessToken } from "@/lib/access-token";
+import { parseDateInput } from "@/lib/utils";
 import { auth } from "@/auth";
 import { logActivity } from "@/lib/activity";
 import type { GoalCategory } from "@/generated/prisma/enums";
@@ -77,7 +78,7 @@ export async function submitIntake(token: string, formData: FormData) {
       data: {
         firstName,
         lastName,
-        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
+        dateOfBirth: parseDateInput(dateOfBirth) ?? undefined,
         sex,
         category: goal,
         heightCm: heightCm ? heightCm : undefined,

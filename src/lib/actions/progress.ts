@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { logActivity } from "@/lib/activity";
+import { parseDateInput } from "@/lib/utils";
 import type { PhotoType } from "@/generated/prisma/enums";
 
 function num(name: string, formData: FormData): number | null {
@@ -18,7 +19,7 @@ export async function createProgressEntry(clientId: string, formData: FormData) 
   await prisma.progressEntry.create({
     data: {
       clientId,
-      date: formData.get("date") ? new Date(String(formData.get("date"))) : new Date(),
+      date: parseDateInput(formData.get("date")) ?? new Date(),
       weightKg: num("weightKg", formData),
       chestCm: num("chestCm", formData),
       waistCm: num("waistCm", formData),
@@ -56,7 +57,7 @@ export async function createProgressPhoto(clientId: string, formData: FormData) 
       clientId,
       url,
       type,
-      date: formData.get("date") ? new Date(String(formData.get("date"))) : new Date(),
+      date: parseDateInput(formData.get("date")) ?? new Date(),
       note: String(formData.get("note") ?? "") || null,
     },
   });

@@ -5,13 +5,21 @@ import { submitIntake } from "@/lib/actions/intake";
 import { Button, Input, Label, Select, Textarea } from "@/components/ui";
 import { GOAL_CATEGORY_LABELS } from "@/lib/labels";
 
-export function IntakeForm({ token, clientName }: { token: string; clientName: string }) {
+export function IntakeForm({
+  token,
+  clientName,
+  alreadySubmitted,
+}: {
+  token: string;
+  clientName: string;
+  alreadySubmitted?: boolean;
+}) {
   const [state, action, pending] = useActionState(
     (_prev: { error?: string } | null, formData: FormData) => submitIntake(token, formData),
     null
   );
 
-  if (state && "ok" in state) {
+  if (alreadySubmitted || (state && "ok" in state)) {
     return (
       <div className="space-y-4 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-700">
