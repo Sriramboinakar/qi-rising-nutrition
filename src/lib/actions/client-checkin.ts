@@ -141,6 +141,10 @@ function buildWeeklySummary(
 
   if (input.adherencePct !== null) lines.push(`Adherence: ${input.adherencePct}%`);
 
+  if (input.energyLevel !== null) lines.push(`Energy: ${input.energyLevel}/10`);
+
+  if (input.mood !== null) lines.push(`Mood: ${input.mood}/10`);
+
   if (input.sleepHours !== null && prev?.sleepHours !== null && prev?.sleepHours !== undefined) {
     const trend = input.sleepHours - Number(prev.sleepHours);
     lines.push(`Sleep: ${trend > 0 ? "Improved" : trend < 0 ? "Declined" : "Unchanged"}`);

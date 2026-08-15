@@ -5,6 +5,7 @@ import { Badge, Button, Card, CardHeader, EmptyState } from "@/components/ui";
 import { StaggerChildren } from "@/components/stagger-children";
 import { NutritionSummary, type NutritionSummarySource } from "@/components/nutrition-summary";
 import { NutritionTargetOverride } from "@/components/nutrition-target-override";
+import { CheckInStatusCard } from "@/components/checkin-status-card";
 import { buildNutritionProfile } from "@/lib/nutrition";
 import { formatDate, formatNumber } from "@/lib/utils";
 import { FOLLOWUP_PRIORITY_LABELS, FOLLOWUP_PRIORITY_TONES, SEX_LABELS } from "@/lib/labels";
@@ -79,6 +80,15 @@ export default async function ClientOverviewPage({
   return (
     <StaggerChildren stagger={0.06} className="grid grid-cols-1 gap-6 xl:grid-cols-3">
       <div className="space-y-6 xl:col-span-2">
+        <CheckInStatusCard
+          clientStatus={client.status}
+          intakeSubmittedAt={client.intakeSubmittedAt}
+          programStartDate={client.programStartDate}
+          createdAt={client.createdAt}
+          latestCheckIn={latestCheckIn ? { checkInDate: latestCheckIn.checkInDate, weekNumber: latestCheckIn.weekNumber } : null}
+          latestSummary={latestCheckIn?.summary ?? null}
+        />
+
         <NutritionSummary source={nutritionSource} />
 
         <div className="rounded-xl border border-stone-200">

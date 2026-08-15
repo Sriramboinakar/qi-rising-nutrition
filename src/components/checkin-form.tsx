@@ -23,6 +23,7 @@ export type SerializableCheckIn = {
   notes: string | null;
   response: string | null;
   summary: string | null;
+  reviewedAt: string | null;
   followUpDate: string | null;
 };
 

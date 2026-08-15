@@ -66,6 +66,7 @@ export default async function CheckInsPage({
                 notes: c.notes,
                 response: c.response,
                 summary: c.summary,
+                reviewedAt: c.reviewedAt ? c.reviewedAt.toISOString() : null,
                 followUpDate: c.followUpDate ? c.followUpDate.toISOString() : null,
               }}
             />

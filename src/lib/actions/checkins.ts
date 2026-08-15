@@ -40,6 +40,8 @@ export async function createCheckIn(clientId: string, formData: FormData) {
       notes: String(formData.get("notes") ?? "") || null,
       response: String(formData.get("response") ?? "") || null,
       followUpDate: followUpDate ? new Date(followUpDate) : null,
+      // Coach-recorded check-ins are reviewed by the act of entering them.
+      reviewedAt: new Date(),
     },
   });
 
@@ -75,8 +77,17 @@ export async function updateCheckIn(clientId: string, checkInId: string, formDat
       notes: String(formData.get("notes") ?? "") || null,
       response: String(formData.get("response") ?? "") || null,
       followUpDate: followUpDate ? new Date(followUpDate) : null,
+      // Editing a check-in counts as reviewing it (for client-submitted ones).
+      reviewedAt: new Date(),
     },
   });
+
+  await logActivity(
+    session.user.id,
+    clientId,
+    "checkin.reviewed",
+    "Reviewed weekly check-in"
+  );
 
   revalidatePath(`/clients/${clientId}`);
   revalidatePath(`/clients/${clientId}/checkins`);
@@ -102,6 +113,22 @@ export async function markCheckInMissed(clientId: string, weekNumber: number) {
   });
 
   await logActivity(session.user.id, clientId, "checkin.missed", `Marked week ${weekNumber} as missed`);
+  revalidatePath(`/clients/${clientId}/checkins`);
+  revalidatePath("/dashboard");
+}
+
+/** Marks a client-submitted check-in as reviewed by the coach. */
+export async function markCheckInReviewed(clientId: string, checkInId: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Not authenticated");
+
+  await prisma.checkIn.update({
+    where: { id: checkInId },
+    data: { reviewedAt: new Date() },
+  });
+
+  await logActivity(session.user.id, clientId, "checkin.reviewed", "Reviewed weekly check-in");
+  revalidatePath(`/clients/${clientId}`);
   revalidatePath(`/clients/${clientId}/checkins`);
   revalidatePath("/dashboard");
 }

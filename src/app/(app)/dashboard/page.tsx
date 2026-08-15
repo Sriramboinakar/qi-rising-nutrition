@@ -3,13 +3,14 @@ import { Suspense } from "react";
 import { auth } from "@/auth";
 import {
   getDashboardStats,
-  getDashboardAttention,
   getDashboardUpcoming,
 } from "@/lib/queries/dashboard";
+import { getDashboardAttention, type AttentionKind } from "@/lib/queries/attention";
 import { Badge, Button, Card, CardHeader, EmptyState, PageHeader } from "@/components/ui";
 import { StaggerChildren } from "@/components/stagger-children";
 import { Skeleton } from "@/components/skeleton";
 import { CountUp } from "@/components/count-up";
+import { SendCheckInLinkButton } from "@/components/send-checkin-link";
 import { formatDate } from "@/lib/utils";
 import {
   Users,
@@ -23,7 +24,12 @@ import {
 
 export const dynamic = "force-dynamic";
 
-const SEVERITY_TONE = { high: "red", medium: "amber", low: "blue" } as const;
+const KIND_META: Record<AttentionKind, { tone: "red" | "violet" | "amber" | "blue"; dot: string; label: string }> = {
+  OVERDUE: { tone: "red", dot: "bg-red-500", label: "Overdue" },
+  NEW_CHECKIN: { tone: "violet", dot: "bg-violet-500", label: "New check-in" },
+  PLAN_EXPIRING: { tone: "amber", dot: "bg-orange-500", label: "Plan expiring" },
+  DUE: { tone: "blue", dot: "bg-amber-400", label: "Due" },
+};
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -144,7 +150,11 @@ async function AttentionSection() {
     <Card>
       <CardHeader
         title="Needs attention"
-        subtitle="Clients sorted by urgency, with the action required"
+        subtitle={
+          attention.length === 0
+            ? "No clients need action"
+            : `${attention.length} client${attention.length === 1 ? "" : "s"} need attention`
+        }
         action={
           <Link href="/clients">
             <Button variant="ghost" size="sm">
@@ -163,27 +173,50 @@ async function AttentionSection() {
             />
           </div>
         ) : (
-          attention.map((item) => (
-            <Link
-              key={`${item.clientId}-${item.reason}`}
-              href={`/clients/${item.clientId}`}
-              className="group flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-stone-50"
-            >
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="font-medium text-stone-900">{item.clientName}</p>
-                  <Badge tone={SEVERITY_TONE[item.severity]}>{item.reason}</Badge>
+          attention.map((item) => {
+            const meta = KIND_META[item.kind];
+            return (
+              <div
+                key={`${item.clientId}-${item.kind}`}
+                className="flex flex-wrap items-center justify-between gap-3 px-5 py-4"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${meta.dot}`} aria-hidden="true" />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-stone-900">{item.clientName}</p>
+                      <Badge tone={meta.tone}>{meta.label}</Badge>
+                    </div>
+                    <p className="mt-0.5 truncate text-sm text-stone-500">{item.detail}</p>
+                  </div>
                 </div>
-                <p className="mt-0.5 truncate text-sm text-stone-500">{item.detail}</p>
+                <div className="flex shrink-0 items-center gap-2">
+                  {item.kind === "NEW_CHECKIN" ? (
+                    <Link href={`/clients/${item.clientId}/checkins`}>
+                      <Button variant="secondary" size="sm">
+                        Review
+                      </Button>
+                    </Link>
+                  ) : null}
+                  {item.kind === "PLAN_EXPIRING" ? (
+                    <Link href={`/clients/${item.clientId}/plan`}>
+                      <Button variant="secondary" size="sm">
+                        Renew plan
+                      </Button>
+                    </Link>
+                  ) : null}
+                  {item.canSendLink ? (
+                    <SendCheckInLinkButton clientId={item.clientId} />
+                  ) : null}
+                  <Link href={`/clients/${item.clientId}`}>
+                    <Button variant="ghost" size="sm">
+                      View client <ArrowUpRight className="h-3.5 w-3.5" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
-              <div className="flex shrink-0 items-center gap-3">
-                <span className="hidden text-xs font-medium text-brand-700 sm:inline">
-                  {item.action}
-                </span>
-                <ArrowUpRight className="h-4 w-4 text-stone-300 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </div>
-            </Link>
-          ))
+            );
+          })
         )}
       </div>
     </Card>

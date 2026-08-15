@@ -6,7 +6,8 @@ import { CheckInForm } from "@/components/checkin-form";
 import { Badge, Button } from "@/components/ui";
 import { CHECKIN_STATUS_LABELS, CHECKIN_STATUS_TONES } from "@/lib/labels";
 import { formatDate, formatNumber } from "@/lib/utils";
-import { Pencil, X } from "lucide-react";
+import { markCheckInReviewed } from "@/lib/actions/checkins";
+import { Pencil, X, Check } from "lucide-react";
 import type { SerializableCheckIn } from "@/components/checkin-form";
 
 type SerializedCheckIn = SerializableCheckIn;
@@ -19,7 +20,23 @@ export function CheckInRow({
   checkIn: SerializedCheckIn;
 }) {
   const [editing, setEditing] = useState(false);
+  const [reviewed, setReviewed] = useState(Boolean(checkIn.reviewedAt));
+  const [marking, setMarking] = useState(false);
   const reduced = useReducedMotion();
+
+  async function markReviewed() {
+    setMarking(true);
+    try {
+      await markCheckInReviewed(clientId, checkIn.id);
+      setReviewed(true);
+    } catch {
+      // surface via console; the row remains actionable on next load
+    } finally {
+      setMarking(false);
+    }
+  }
+
+  const needsReview = !reviewed;
 
   return (
     <div className="border-b border-stone-100 px-5 py-4 last:border-0">
@@ -38,9 +55,20 @@ export function CheckInRow({
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {needsReview ? (
+            <Badge tone="violet">Needs review</Badge>
+          ) : (
+            <Badge tone="blue">Reviewed</Badge>
+          )}
           <Badge tone={CHECKIN_STATUS_TONES[checkIn.status]}>
             {CHECKIN_STATUS_LABELS[checkIn.status]}
           </Badge>
+          {needsReview ? (
+            <Button variant="outline" size="sm" onClick={markReviewed} disabled={marking}>
+              <Check className="h-3.5 w-3.5" />
+              {marking ? "..." : "Mark reviewed"}
+            </Button>
+          ) : null}
           <Button variant="ghost" size="sm" onClick={() => setEditing((v) => !v)}>
             {editing ? <X className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
             {editing ? "Close" : "Edit"}

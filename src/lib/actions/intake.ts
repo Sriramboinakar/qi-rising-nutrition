@@ -27,6 +27,21 @@ export async function createClientAccessLinks(clientId: string) {
   return { intake, checkin, plan };
 }
 
+/** Coach-facing: issue a single fresh check-in link for one-click sharing. */
+export async function getClientCheckInLink(clientId: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Not authenticated");
+
+  const client = await prisma.client.findUnique({
+    where: { id: clientId },
+    select: { coachId: true },
+  });
+  if (!client || client.coachId !== session.user.id) throw new Error("Not authorized");
+
+  const token = await issueAccessToken(clientId, "CHECKIN");
+  return token;
+}
+
 function num(name: string, formData: FormData): number | null {
   const v = String(formData.get(name) ?? "").trim();
   return v ? Number(v) : null;
