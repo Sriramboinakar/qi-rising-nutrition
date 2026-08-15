@@ -30,8 +30,23 @@ const EMPTY_MEAL: MealRow = {
   notes: "",
 };
 
-export function PlanForm({ clientId }: { clientId: string }) {
+export function PlanForm({
+  clientId,
+  prefill,
+}: {
+  clientId: string;
+  prefill?: {
+    calories: number | null;
+    protein: number | null;
+    carbs: number | null;
+    fat: number | null;
+  };
+}) {
   const [meals, setMeals] = useState<MealRow[]>([EMPTY_MEAL]);
+  const [calories, setCalories] = useState(prefill?.calories?.toString() ?? "");
+  const [protein, setProtein] = useState(prefill?.protein?.toString() ?? "");
+  const [carbs, setCarbs] = useState(prefill?.carbs?.toString() ?? "");
+  const [fat, setFat] = useState(prefill?.fat?.toString() ?? "");
 
   const [state, formAction, pending] = useActionState<State, FormData>(async (_prev, fd) => {
     const res = await createPlan(clientId, fd);
@@ -72,21 +87,50 @@ export function PlanForm({ clientId }: { clientId: string }) {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div>
           <Label htmlFor="calories">Calories (kcal)</Label>
-          <Input id="calories" name="calories" type="number" />
+          <Input
+            id="calories"
+            name="calories"
+            type="number"
+            value={calories}
+            onChange={(e) => setCalories(e.target.value)}
+          />
         </div>
         <div>
           <Label htmlFor="proteinG">Protein (g)</Label>
-          <Input id="proteinG" name="proteinG" type="number" />
+          <Input
+            id="proteinG"
+            name="proteinG"
+            type="number"
+            value={protein}
+            onChange={(e) => setProtein(e.target.value)}
+          />
         </div>
         <div>
           <Label htmlFor="carbsG">Carbs (g)</Label>
-          <Input id="carbsG" name="carbsG" type="number" />
+          <Input
+            id="carbsG"
+            name="carbsG"
+            type="number"
+            value={carbs}
+            onChange={(e) => setCarbs(e.target.value)}
+          />
         </div>
         <div>
           <Label htmlFor="fatG">Fat (g)</Label>
-          <Input id="fatG" name="fatG" type="number" />
+          <Input
+            id="fatG"
+            name="fatG"
+            type="number"
+            value={fat}
+            onChange={(e) => setFat(e.target.value)}
+          />
         </div>
       </div>
+      {prefill ? (
+        <p className="-mt-2 text-xs text-stone-400">
+          Prefilled from the client&apos;s calculated targets — adjust freely before saving.
+        </p>
+      ) : null}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>

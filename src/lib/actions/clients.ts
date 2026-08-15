@@ -98,3 +98,37 @@ export async function setClientStatus(clientId: string, status: ClientStatus) {
   revalidatePath(`/clients/${clientId}`);
   revalidatePath("/dashboard");
 }
+
+/** Coach override of calculated nutrition targets. Null clears the override. */
+export async function setNutritionTargets(
+  clientId: string,
+  formData: FormData
+): Promise<{ error?: string }> {
+  const session = await auth();
+  if (!session?.user) return { error: "Not authenticated" };
+
+  const num = (name: string): number | null => {
+    const v = String(formData.get(name) ?? "").trim();
+    return v ? Number(v) : null;
+  };
+
+  await prisma.client.update({
+    where: { id: clientId },
+    data: {
+      calorieTarget: num("calorieTarget"),
+      proteinTargetG: num("proteinTargetG"),
+      carbsTargetG: num("carbsTargetG"),
+      fatTargetG: num("fatTargetG"),
+    },
+  });
+
+  await logActivity(
+    session.user.id,
+    clientId,
+    "client.targets",
+    "Updated nutrition target overrides"
+  );
+  revalidatePath(`/clients/${clientId}`);
+  revalidatePath("/dashboard");
+  return {};
+}

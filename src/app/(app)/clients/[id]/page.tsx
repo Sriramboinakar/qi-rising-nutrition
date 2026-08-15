@@ -3,6 +3,9 @@ import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { Badge, Button, Card, CardHeader, EmptyState } from "@/components/ui";
 import { StaggerChildren } from "@/components/stagger-children";
+import { NutritionSummary, type NutritionSummarySource } from "@/components/nutrition-summary";
+import { NutritionTargetOverride } from "@/components/nutrition-target-override";
+import { buildNutritionProfile } from "@/lib/nutrition";
 import { formatDate, formatNumber } from "@/lib/utils";
 import { FOLLOWUP_PRIORITY_LABELS, FOLLOWUP_PRIORITY_TONES, SEX_LABELS } from "@/lib/labels";
 import { ClipboardList, MessageSquareText, CalendarClock, Activity } from "lucide-react";
@@ -37,6 +40,32 @@ export default async function ClientOverviewPage({
   const latestAssessment = client.assessments[0];
   const latestCheckIn = client.checkIns[0];
 
+  const nutritionSource: NutritionSummarySource = {
+    weightKg: latestAssessment?.weightKg !== null && latestAssessment?.weightKg !== undefined
+      ? Number(latestAssessment.weightKg)
+      : null,
+    heightCm: latestAssessment?.heightCm ?? client.heightCm
+      ? Number(latestAssessment?.heightCm ?? client.heightCm)
+      : null,
+    dateOfBirth: client.dateOfBirth,
+    sex: client.sex,
+    activityLevel: latestAssessment?.activityLevel ?? null,
+    goal: client.category,
+    calorieTarget: client.calorieTarget,
+    proteinTargetG: client.proteinTargetG,
+    carbsTargetG: client.carbsTargetG,
+    fatTargetG: client.fatTargetG,
+  };
+
+  const nutritionProfile = buildNutritionProfile({
+    weightKg: nutritionSource.weightKg,
+    heightCm: nutritionSource.heightCm,
+    dateOfBirth: nutritionSource.dateOfBirth,
+    sex: nutritionSource.sex,
+    activityLevel: nutritionSource.activityLevel,
+    goal: nutritionSource.goal,
+  });
+
   const details = [
     { label: "Email", value: client.email ?? "—" },
     { label: "Phone", value: client.phone ?? "—" },
@@ -50,6 +79,26 @@ export default async function ClientOverviewPage({
   return (
     <StaggerChildren stagger={0.06} className="grid grid-cols-1 gap-6 xl:grid-cols-3">
       <div className="space-y-6 xl:col-span-2">
+        <NutritionSummary source={nutritionSource} />
+
+        <div className="rounded-xl border border-stone-200">
+          <NutritionTargetOverride
+            clientId={client.id}
+            current={{
+              calories: client.calorieTarget,
+              protein: client.proteinTargetG,
+              carbs: client.carbsTargetG,
+              fat: client.fatTargetG,
+            }}
+            calculated={{
+              calories: nutritionProfile.calorieTarget,
+              protein: nutritionProfile.proteinG,
+              carbs: nutritionProfile.carbsG,
+              fat: nutritionProfile.fatG,
+            }}
+          />
+        </div>
+
         <Card>
           <CardHeader title="Client details" />
           <dl className="grid grid-cols-1 gap-x-8 gap-y-4 px-5 py-4 sm:grid-cols-2">
