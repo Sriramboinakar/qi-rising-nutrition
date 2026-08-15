@@ -22,6 +22,7 @@ export type SerializableCheckIn = {
   waterLiters: string | null;
   notes: string | null;
   response: string | null;
+  summary: string | null;
   followUpDate: string | null;
 };
 

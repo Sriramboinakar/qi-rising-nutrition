@@ -140,6 +140,8 @@ model Client {
   emergencyContact String?
   notes           String?      @db.Text
   photoUrl        String?
+  intakeSubmittedAt DateTime?
+  intakeReviewedAt  DateTime?
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
@@ -154,6 +156,7 @@ model Client {
   coachNotes  CoachNote[]
   followUps   FollowUp[]
   activities  Activity[]
+  accessTokens ClientAccessToken[]
 
   @@index([coachId])
   @@index([status])
@@ -184,6 +187,11 @@ model Assessment {
   allergies    String?        @db.Text
   medications  String?        @db.Text
   lifestyleNotes String?      @db.Text
+  dietaryPreference String?
+  foodRestrictions String?
+  mealTiming   String?
+  sleepHours   Decimal?       @db.Decimal(4, 2)
+  waterLiters  Decimal?       @db.Decimal(4, 2)
   notes        String?        @db.Text
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
@@ -259,6 +267,7 @@ model CheckIn {
   waterLiters   Decimal?      @db.Decimal(4, 2)
   notes         String?       @db.Text
   response      String?       @db.Text
+  summary       String?       @db.Text
   followUpDate  DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
@@ -415,4 +424,24 @@ model Setting {
   key       String   @id
   value     String   @db.Text
   updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Client self-service access tokens (intake / check-in / plan links)
+// ---------------------------------------------------------------------------
+
+model ClientAccessToken {
+  id          String    @id @default(cuid())
+  clientId    String
+  tokenHash   String    @unique
+  purpose     String    @default("INTAKE") // "INTAKE" | "CHECKIN" | "PLAN"
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([expiresAt])
 }

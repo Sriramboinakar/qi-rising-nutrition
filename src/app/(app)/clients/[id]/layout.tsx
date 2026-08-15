@@ -6,6 +6,7 @@ import { CLIENT_STATUS_LABELS, CLIENT_STATUS_TONES, GOAL_CATEGORY_LABELS } from 
 import { fullName, initials, formatDate } from "@/lib/utils";
 import { Pencil } from "lucide-react";
 import Link from "next/link";
+import { ClientAccessLinks } from "@/components/client-access-links";
 
 export default async function ClientLayout({
   children,
@@ -23,6 +24,8 @@ export default async function ClientLayout({
       lastName: true,
       category: true,
       status: true,
+      intakeSubmittedAt: true,
+      intakeReviewedAt: true,
       programStartDate: true,
       program: { select: { name: true } },
     },
@@ -45,6 +48,10 @@ export default async function ClientLayout({
               <Badge tone={CLIENT_STATUS_TONES[client.status]}>
                 {CLIENT_STATUS_LABELS[client.status]}
               </Badge>
+              {client.intakeSubmittedAt && !client.intakeReviewedAt ? (
+                <Badge tone="amber">Intake submitted</Badge>
+              ) : null}
+              {client.intakeReviewedAt ? <Badge tone="blue">Intake reviewed</Badge> : null}
             </div>
             <p className="mt-0.5 truncate text-sm text-stone-500">
               {GOAL_CATEGORY_LABELS[client.category]} ·{" "}
@@ -53,11 +60,14 @@ export default async function ClientLayout({
             </p>
           </div>
         </div>
-        <Link href={`/clients/${client.id}/edit`}>
-          <Button variant="outline" size="sm">
-            <Pencil className="h-3.5 w-3.5" /> Edit profile
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <ClientAccessLinks clientId={client.id} />
+          <Link href={`/clients/${client.id}/edit`}>
+            <Button variant="outline" size="sm">
+              <Pencil className="h-3.5 w-3.5" /> Edit profile
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <ClientTabs clientId={client.id} />

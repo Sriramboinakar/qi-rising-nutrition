@@ -48,6 +48,12 @@ export function CheckInRow({
         </div>
       </div>
 
+      {checkIn.summary ? (
+        <div className="mt-2 rounded-lg bg-violet-50 px-3 py-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-violet-500">Weekly summary</p>
+          <p className="mt-1 text-sm whitespace-pre-wrap text-violet-900">{checkIn.summary}</p>
+        </div>
+      ) : null}
       {checkIn.notes ? (
         <p className="mt-2 rounded-lg bg-stone-50 px-3 py-2 text-sm text-stone-600">
           <span className="font-medium text-stone-700">Client:</span> {checkIn.notes}

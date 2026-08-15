@@ -65,6 +65,7 @@ export default async function CheckInsPage({
                 waterLiters: c.waterLiters !== null ? c.waterLiters.toString() : null,
                 notes: c.notes,
                 response: c.response,
+                summary: c.summary,
                 followUpDate: c.followUpDate ? c.followUpDate.toISOString() : null,
               }}
             />
