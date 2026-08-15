@@ -17,7 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { logoutAction } from "@/lib/actions/auth";
+import { signOut } from "next-auth/react";
 import type { Role } from "@/generated/prisma/enums";
 
 type NavItem = {
@@ -140,15 +140,14 @@ function SidebarContent({
             <p className="truncate text-[11px] text-sidebar-fg">{email}</p>
           </div>
         </div>
-        <form action={logoutAction}>
-          <button
-            type="submit"
-            className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-fg transition-colors hover:bg-white/5 hover:text-white"
-          >
-            <LogOut className="h-4 w-4 shrink-0" />
-            Sign out
-          </button>
-        </form>
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-fg transition-colors hover:bg-white/5 hover:text-white"
+        >
+          <LogOut className="h-4 w-4 shrink-0" />
+          Sign out
+        </button>
       </div>
     </div>
   );

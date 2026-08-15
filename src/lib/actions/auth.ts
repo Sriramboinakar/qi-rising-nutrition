@@ -1,8 +1,7 @@
 "use server";
 
 import { AuthError } from "next-auth";
-import { signIn, signOut } from "@/auth";
-import { redirect } from "next/navigation";
+import { signIn } from "@/auth";
 
 export type LoginState = { error?: string };
 
@@ -25,7 +24,3 @@ export async function loginAction(_prevState: LoginState, formData: FormData): P
   }
 }
 
-export async function logoutAction() {
-  await signOut({ redirectTo: "/login" });
-  redirect("/login");
-}

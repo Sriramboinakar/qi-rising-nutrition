@@ -2,44 +2,89 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { issueAccessToken, resolveAccessToken } from "@/lib/access-token";
+import {
+  getOrCreateAccessToken,
+  regenerateAccessToken,
+  resolveAccessToken,
+  type AccessPurpose,
+} from "@/lib/access-token";
 import { parseDateInput } from "@/lib/utils";
 import { auth } from "@/auth";
 import { logActivity } from "@/lib/activity";
 import type { GoalCategory } from "@/generated/prisma/enums";
 
-/** Coach-facing: generate fresh access-link tokens for a client in one round-trip. */
-export async function createClientAccessLinks(clientId: string) {
+/**
+ * Coach-facing: get the stable self-service links for a client, creating
+ * tokens lazily on first use and reusing the same ones afterward. Links are
+ * progressively revealed based on the client's actual state: intake link is
+ * always available, check-in only after intake is submitted, plan only while
+ * an ACTIVE plan exists. The returned URLs never change for the same
+ * client + purpose.
+ */
+export async function getClientAccessLinks(clientId: string) {
   const session = await auth();
   if (!session?.user) throw new Error("Not authenticated");
 
   const client = await prisma.client.findUnique({
     where: { id: clientId },
-    select: { coachId: true },
+    select: {
+      coachId: true,
+      intakeSubmittedAt: true,
+      plans: {
+        where: { status: "ACTIVE" },
+        orderBy: { updatedAt: "desc" },
+        take: 1,
+        select: { id: true, name: true },
+      },
+    },
   });
   if (!client || client.coachId !== session.user.id) throw new Error("Not authorized");
 
-  const [intake, checkin, plan] = await Promise.all([
-    issueAccessToken(clientId, "INTAKE"),
-    issueAccessToken(clientId, "CHECKIN"),
-    issueAccessToken(clientId, "PLAN"),
-  ]);
+  const intakeSubmitted = Boolean(client.intakeSubmittedAt);
+  const activePlan = client.plans[0] ?? null;
 
-  return { intake, checkin, plan };
+  const intake = await getOrCreateAccessToken(clientId, "INTAKE");
+  const checkin = intakeSubmitted ? await getOrCreateAccessToken(clientId, "CHECKIN") : null;
+  const plan = activePlan ? await getOrCreateAccessToken(clientId, "PLAN") : null;
+
+  return {
+    intake,
+    checkin,
+    plan,
+    intakeSubmitted,
+    hasActivePlan: Boolean(activePlan),
+    activePlanName: activePlan?.name ?? null,
+  };
 }
 
-/** Coach-facing: issue a single fresh check-in link for one-click sharing. */
+/** Coach-facing: get (or lazily create) the stable weekly check-in link. */
 export async function getClientCheckInLink(clientId: string) {
   const session = await auth();
   if (!session?.user) throw new Error("Not authenticated");
 
   const client = await prisma.client.findUnique({
     where: { id: clientId },
+    select: { coachId: true, intakeSubmittedAt: true },
+  });
+  if (!client || client.coachId !== session.user.id) throw new Error("Not authorized");
+  if (!client.intakeSubmittedAt) throw new Error("Intake not completed yet");
+
+  return getOrCreateAccessToken(clientId, "CHECKIN");
+}
+
+/** Coach-facing: intentionally rotate a client's link, invalidating the old URL. */
+export async function regenerateClientAccessLink(clientId: string, purpose: AccessPurpose) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Not authenticated");
+
+  const client = await prisma.client.findUnique({
+    where: { id: clientId },
     select: { coachId: true },
   });
   if (!client || client.coachId !== session.user.id) throw new Error("Not authorized");
 
-  const token = await issueAccessToken(clientId, "CHECKIN");
+  const token = await regenerateAccessToken(clientId, purpose);
+  revalidatePath(`/clients/${clientId}`);
   return token;
 }
 

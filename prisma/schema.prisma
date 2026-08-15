@@ -436,14 +436,19 @@ model Setting {
 // ---------------------------------------------------------------------------
 
 model ClientAccessToken {
-  id          String    @id @default(cuid())
+  id          String     @id @default(cuid())
   clientId    String
-  tokenHash   String    @unique
-  purpose     String    @default("INTAKE") // "INTAKE" | "CHECKIN" | "PLAN"
-  expiresAt   DateTime
+  tokenHash   String     @unique
+  // AES-256-GCM encrypted raw token so the same URL can be re-displayed.
+  // Null for legacy Phase 1 rows whose raw value was never stored.
+  tokenCipher String?
+  purpose     String     @default("INTAKE") // "INTAKE" | "CHECKIN" | "PLAN"
+  // Null means the token never expires (stable client link). Kept for
+  // backwards compatibility with the original 90-day expiry model.
+  expiresAt   DateTime?
   revokedAt   DateTime?
   lastUsedAt  DateTime?
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime   @default(now())
 
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 

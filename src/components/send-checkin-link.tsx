@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { getClientCheckInLink } from "@/lib/actions/intake";
-import { Send, Check } from "lucide-react";
+import { Link2, Check } from "lucide-react";
 
 export function SendCheckInLinkButton({ clientId }: { clientId: string }) {
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ export function SendCheckInLinkButton({ clientId }: { clientId: string }) {
       setDone(true);
       setTimeout(() => setDone(false), 2000);
     } catch {
-      setError("Could not create a link. Please try again.");
+      setError("Could not get a link. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ export function SendCheckInLinkButton({ clientId }: { clientId: string }) {
           </>
         ) : (
           <>
-            <Send className="h-3.5 w-3.5" /> {loading ? "Generating..." : "Send check-in link"}
+            <Link2 className="h-3.5 w-3.5" /> {loading ? "Loading..." : "Copy check-in link"}
           </>
         )}
       </button>

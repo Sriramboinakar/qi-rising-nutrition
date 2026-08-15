@@ -44,7 +44,7 @@ export default async function ClientPlanPage({
     >
       {!plan ? (
         <div className="rounded-xl bg-stone-50 px-4 py-3 text-sm text-stone-600">
-          Your coach hasn&apos;t published a plan yet. It will appear here once it&apos;s ready.
+          Your nutrition plan is not available yet. Your coach will update it soon.
         </div>
       ) : (
         <div className="space-y-5">
