@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
+import { getOrCreateAccessToken } from "@/lib/access-token";
 import type { ClientStatus, GoalCategory } from "@/generated/prisma/enums";
 import { logActivity } from "@/lib/activity";
 import { parseDateInput } from "@/lib/utils";
@@ -46,6 +47,34 @@ export async function createClient(formData: FormData) {
 
   revalidatePath("/clients");
   return { id: client.id };
+}
+
+/**
+ * Coach-facing: create a client instantly (name optional) and return a ready
+ * intake link to share directly — no need to fill the full form first. The
+ * client can later be completed manually or via the link.
+ */
+export async function createClientQuickLink(name?: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Not authenticated");
+
+  const parts = (name ?? "").trim().split(/\s+/).filter(Boolean);
+  const firstName = parts[0] || "New Client";
+  const lastName = parts.slice(1).join(" ") || "";
+
+  const client = await prisma.client.create({
+    data: {
+      firstName,
+      lastName,
+      coachId: session.user.id,
+    },
+  });
+
+  const intakeToken = await getOrCreateAccessToken(client.id, "INTAKE");
+  await logActivity(session.user.id, client.id, "client.created", `Created client ${firstName} ${lastName}`);
+
+  revalidatePath("/clients");
+  return { clientId: client.id, intakeToken };
 }
 
 export async function updateClient(clientId: string, formData: FormData) {

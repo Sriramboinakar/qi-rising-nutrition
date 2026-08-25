@@ -43,10 +43,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token;
     },
-    session({ session, token }) {
-      if (session.user) {
-        session.user.id = (token.id as string) ?? "";
-        session.user.role = (token.role as Role) ?? "COACH";
+    session: async ({ session, token }) => {
+      if (session.user && token.id) {
+        // Refresh name/email/role from the DB so profile renames take effect
+        // immediately instead of lingering in the signed-in JWT.
+        const user = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { id: true, name: true, email: true, role: true },
+        });
+        if (user) {
+          session.user.id = user.id;
+          session.user.name = user.name;
+          session.user.email = user.email;
+          session.user.role = user.role;
+        }
       }
       return session;
     },

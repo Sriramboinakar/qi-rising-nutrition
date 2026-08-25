@@ -3,9 +3,10 @@ import { prisma } from "@/lib/db";
 import { Badge, Button, Card, EmptyState, Input, PageHeader, Select } from "@/components/ui";
 import { StaggerChildren } from "@/components/stagger-children";
 import { ShareClientLink } from "@/components/share-client-link";
+import { NewClientMenu } from "@/components/new-client-menu";
 import { CLIENT_STATUS_LABELS, CLIENT_STATUS_TONES, GOAL_CATEGORY_LABELS } from "@/lib/labels";
 import { fullName, initials, formatDate } from "@/lib/utils";
-import { Plus, Search, UserRound } from "lucide-react";
+import { Search, UserRound } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -55,13 +56,7 @@ export default async function ClientsPage({ searchParams }: Props) {
       <PageHeader
         title="Clients"
         description={`${clients.length} client${clients.length === 1 ? "" : "s"}`}
-        action={
-          <Link href="/clients/new">
-            <Button>
-              <Plus className="h-4 w-4" /> New client
-            </Button>
-          </Link>
-        }
+        action={<NewClientMenu />}
       />
 
       <Card className="p-4">
@@ -97,13 +92,7 @@ export default async function ClientsPage({ searchParams }: Props) {
           icon={<UserRound className="h-10 w-10" />}
           title="No clients found"
           description="Create your first client to get started."
-          action={
-            <Link href="/clients/new">
-              <Button>
-                <Plus className="h-4 w-4" /> New client
-              </Button>
-            </Link>
-          }
+          action={<NewClientMenu />}
         />
       ) : (
         <Card className="overflow-hidden">
