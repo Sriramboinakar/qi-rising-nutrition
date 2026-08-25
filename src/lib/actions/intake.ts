@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import {
   getOrCreateAccessToken,
@@ -94,14 +95,12 @@ function num(name: string, formData: FormData): number | null {
 }
 
 /**
- * Client-facing intake submission. Verifies the access token, then creates
- * the initial assessment and updates the client profile from what the client
- * submitted. Never trusts client input to escalate access.
+ * Shared write path for intake data: updates the client profile and creates an
+ * INITIAL assessment. Used by both the client-facing link (submitIntake) and
+ * the coach-facing manual entry (manualSubmitIntake). Returns an error object
+ * on invalid input, otherwise { ok: true }.
  */
-export async function submitIntake(token: string, formData: FormData) {
-  const clientId = await resolveAccessToken(token, "INTAKE");
-  if (!clientId) return { error: "This intake link is invalid or has expired. Please ask your coach for a new one." };
-
+async function applyIntakeData(clientId: string, formData: FormData) {
   const firstName = String(formData.get("firstName") ?? "").trim();
   const lastName = String(formData.get("lastName") ?? "").trim();
   if (!firstName || !lastName) return { error: "First and last name are required." };
@@ -168,6 +167,39 @@ export async function submitIntake(token: string, formData: FormData) {
   revalidatePath("/clients");
   revalidatePath("/dashboard");
   return { ok: true };
+}
+
+/**
+ * Client-facing intake submission. Verifies the access token, then creates
+ * the initial assessment and updates the client profile from what the client
+ * submitted. Never trusts client input to escalate access.
+ */
+export async function submitIntake(token: string, formData: FormData) {
+  const clientId = await resolveAccessToken(token, "INTAKE");
+  if (!clientId) return { error: "This intake link is invalid or has expired. Please ask your coach for a new one." };
+  return applyIntakeData(clientId, formData);
+}
+
+/**
+ * Coach-facing: manually record a client's intake when they did not (or could
+ * not) fill the intake link. Same write path as the link, but authenticated as
+ * the coach who owns the client. Redirects to the client profile on success.
+ */
+export async function manualSubmitIntake(clientId: string, formData: FormData) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Not authenticated");
+
+  const client = await prisma.client.findUnique({
+    where: { id: clientId },
+    select: { coachId: true },
+  });
+  if (!client || client.coachId !== session.user.id) throw new Error("Not authorized");
+
+  const result = await applyIntakeData(clientId, formData);
+  if (result && "ok" in result) {
+    redirect(`/clients/${clientId}`);
+  }
+  return result;
 }
 
 /** Marks an intake as reviewed by the coach. */

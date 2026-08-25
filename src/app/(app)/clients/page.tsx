@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Badge, Button, Card, EmptyState, Input, PageHeader, Select } from "@/components/ui";
 import { StaggerChildren } from "@/components/stagger-children";
+import { ShareClientLink } from "@/components/share-client-link";
 import { CLIENT_STATUS_LABELS, CLIENT_STATUS_TONES, GOAL_CATEGORY_LABELS } from "@/lib/labels";
 import { fullName, initials, formatDate } from "@/lib/utils";
 import { Plus, Search, UserRound } from "lucide-react";
@@ -115,6 +116,7 @@ export default async function ClientsPage({ searchParams }: Props) {
                   <th className="px-5 py-3 font-medium">Program</th>
                   <th className="px-5 py-3 font-medium">Last check-in</th>
                   <th className="px-5 py-3 font-medium">Status</th>
+                  <th className="px-5 py-3 font-medium">Share intake</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-50">
@@ -144,6 +146,9 @@ export default async function ClientsPage({ searchParams }: Props) {
                       <Badge tone={CLIENT_STATUS_TONES[client.status]}>
                         {CLIENT_STATUS_LABELS[client.status]}
                       </Badge>
+                    </td>
+                    <td className="px-5 py-3">
+                      <ShareClientLink clientId={client.id} />
                     </td>
                   </tr>
                 ))}
