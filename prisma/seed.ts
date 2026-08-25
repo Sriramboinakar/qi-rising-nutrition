@@ -40,16 +40,16 @@ async function main() {
   if (!existing) {
     await prisma.user.create({
       data: {
-        name: "Srira",
+        name: "Shevvy",
         email: adminEmail,
         passwordHash: await bcrypt.hash(adminPassword, 12),
         role: "SUPER_ADMIN",
       },
     });
-  } else if (existing.name !== "Srira") {
+  } else if (existing.name !== "Shevvy") {
     await prisma.user.update({
       where: { id: existing.id },
-      data: { name: "Srira" },
+      data: { name: "Shevvy" },
     });
   }
 
