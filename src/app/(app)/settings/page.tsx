@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { Button, Card, CardHeader, Input, Label, PageHeader } from "@/components/ui";
 import { saveSettings } from "@/lib/actions/settings";
+import { TestDataCleanup } from "@/components/test-data-cleanup";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,16 @@ export default async function SettingsPage() {
             ))}
             <Button type="submit">Save settings</Button>
           </form>
+        </div>
+      </Card>
+
+      <Card className="max-w-2xl">
+        <CardHeader
+          title="Data cleanup"
+          subtitle="Remove test and demo clients that were created while testing the platform."
+        />
+        <div className="px-5 py-5">
+          <TestDataCleanup />
         </div>
       </Card>
     </div>

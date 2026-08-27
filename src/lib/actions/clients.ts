@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { getOrCreateAccessToken } from "@/lib/access-token";
+import { TEST_EMAIL_DOMAINS } from "@/lib/test-data";
 import type { ClientStatus, GoalCategory } from "@/generated/prisma/enums";
 import { logActivity } from "@/lib/activity";
 import { parseDateInput } from "@/lib/utils";
@@ -127,6 +128,55 @@ export async function setClientStatus(clientId: string, status: ClientStatus) {
   await logActivity(session.user.id, clientId, "client.status", `Marked client as ${status.toLowerCase()}`);
   revalidatePath(`/clients/${clientId}`);
   revalidatePath("/dashboard");
+}
+
+/**
+ * Bulk-delete clients by id. Coach can only delete their own clients; a
+ * SUPER_ADMIN can delete any. Child records (assessments, plans, check-ins,
+ * tokens, notes, follow-ups, activity) cascade via DB ON DELETE CASCADE.
+ */
+export async function bulkDeleteClients(ids: string[]): Promise<{ error?: string; count?: number }> {
+  const session = await auth();
+  if (!session?.user) return { error: "Not authenticated" };
+
+  const cleanIds = Array.isArray(ids)
+    ? ids.filter((id): id is string => typeof id === "string" && id.length > 0).slice(0, 500)
+    : [];
+  if (cleanIds.length === 0) return { error: "Nothing selected to delete." };
+
+  const result = await prisma.client.deleteMany({
+    where: {
+      id: { in: cleanIds },
+      ...(session.user.role === "SUPER_ADMIN" ? {} : { coachId: session.user.id }),
+    },
+  });
+
+  revalidatePath("/clients");
+  revalidatePath("/dashboard");
+  return { count: result.count };
+}
+
+const TEST_DOMAINS = TEST_EMAIL_DOMAINS;
+
+/** List obvious test/demo clients (reserved email domains) for cleanup. */
+export async function getTestClients() {
+  const session = await auth();
+  if (!session?.user) return [];
+
+  return prisma.client.findMany({
+    where: {
+      OR: TEST_DOMAINS.map((d) => ({ email: { endsWith: d } })),
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      createdAt: true,
+      _count: { select: { assessments: true, checkIns: true, plans: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
 }
 
 /** Coach override of calculated nutrition targets. Null clears the override. */
