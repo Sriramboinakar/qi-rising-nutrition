@@ -31,13 +31,15 @@ export default async function PlanPage({
   if (!client) notFound();
 
   const latestAssessment = client.assessments[0];
+  const toNum = (v: unknown): number | null => (v === null || v === undefined ? null : Number(v));
   const profile = buildNutritionProfile({
-    weightKg: latestAssessment?.weightKg !== null && latestAssessment?.weightKg !== undefined
-      ? Number(latestAssessment.weightKg)
-      : null,
-    heightCm: latestAssessment?.heightCm ?? client.heightCm
-      ? Number(latestAssessment?.heightCm ?? client.heightCm)
-      : null,
+    weightKg: toNum(latestAssessment?.weightKg),
+    heightCm:
+      latestAssessment?.heightCm != null
+        ? toNum(latestAssessment.heightCm)
+        : client.heightCm != null
+          ? toNum(client.heightCm)
+          : null,
     dateOfBirth: client.dateOfBirth,
     sex: client.sex,
     activityLevel: latestAssessment?.activityLevel ?? null,

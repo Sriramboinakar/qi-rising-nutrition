@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { getClientAccessLinks, regenerateClientAccessLink } from "@/lib/actions/intake";
 import { Button, Badge } from "@/components/ui";
+import { PortalModal } from "@/components/portal-modal";
 import { Link2, Copy, Check, RefreshCw } from "lucide-react";
 import type { AccessPurpose } from "@/lib/access-token";
 
@@ -107,91 +108,87 @@ export function ClientAccessLinks({ clientId }: { clientId: string }) {
   }
 
   return (
-    <div className="relative">
+    <>
       <Button
         variant="outline"
         size="sm"
         onClick={() => {
-          setOpen((v) => !v);
+          setOpen(true);
           if (!links && !loading) loadLinks();
         }}
+        aria-haspopup="dialog"
+        aria-expanded={open}
       >
         <Link2 className="h-4 w-4" /> Client links
       </Button>
 
-      {open ? (
-        <div className="absolute right-0 z-20 mt-2 w-[22rem] max-w-[calc(100vw-2rem)] rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-medium text-stone-900">Share with client</p>
-            <Badge tone="green">Stable links</Badge>
-          </div>
-          <p className="mt-0.5 text-xs text-stone-500">
-            Each link stays the same — copy it any time. Revoke &amp; regenerate if it&apos;s ever shared
-            publicly.
-          </p>
-
-          {loading ? (
-            <p className="mt-3 text-sm text-stone-500">Loading links...</p>
-          ) : error ? (
-            <p className="mt-3 text-sm text-red-600">{error}</p>
-          ) : links ? (
-            <div className="mt-3 space-y-2">
-              {rows.map((row) => (
-                <div
-                  key={row.purpose}
-                  className="flex items-center justify-between gap-2 rounded-lg border border-stone-100 bg-stone-50 px-3 py-2"
-                >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-stone-800">{row.label}</p>
-                      <Badge tone={row.status.tone}>{row.status.label}</Badge>
-                    </div>
-                    <p className="truncate text-xs text-stone-400">{row.hint}</p>
-                    {!row.url && row.lockedNote ? (
-                      <p className="text-xs text-stone-400">{row.lockedNote}</p>
-                    ) : null}
+      <PortalModal
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Share with client"
+        subtitle="Each link stays the same — copy it any time. Revoke &amp; regenerate if it&apos;s ever shared publicly."
+      >
+        {loading ? (
+          <p className="py-6 text-center text-sm text-stone-500">Loading links...</p>
+        ) : error ? (
+          <p className="py-6 text-center text-sm text-red-600">{error}</p>
+        ) : links ? (
+          <div className="space-y-2">
+            {rows.map((row) => (
+              <div
+                key={row.purpose}
+                className="flex items-center justify-between gap-2 rounded-lg border border-stone-100 bg-stone-50 px-3 py-2"
+              >
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-stone-800">{row.label}</p>
+                    <Badge tone={row.status.tone}>{row.status.label}</Badge>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1">
-                    {row.url ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => copy(row.url!, row.purpose)}
-                          className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-stone-200 hover:text-stone-900"
-                          aria-label={`Copy ${row.label} link`}
-                          title={`Copy ${row.label} link`}
-                          data-clipboard-text={row.url!}
-                        >
-                          {copied === row.purpose ? (
-                            <Check className="h-4 w-4 text-green-600" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => rotate(row.purpose)}
-                          className="rounded-md p-1.5 text-stone-400 transition-colors hover:bg-stone-200 hover:text-stone-900"
-                          aria-label={`Regenerate ${row.label} link`}
-                          title="Regenerate (old link stops working)"
-                        >
-                          <RefreshCw className="h-3.5 w-3.5" />
-                        </button>
-                      </>
-                    ) : null}
-                  </div>
+                  <p className="truncate text-xs text-stone-400">{row.hint}</p>
+                  {!row.url && row.lockedNote ? (
+                    <p className="text-xs text-stone-400">{row.lockedNote}</p>
+                  ) : null}
                 </div>
-              ))}
-              <div className="flex items-center justify-between gap-2 pt-1">
-                <Button variant="ghost" size="sm" onClick={copyMessage}>
-                  Copy all links
-                </Button>
-                <p className="text-xs text-stone-400">Paste into WhatsApp or email</p>
+                <div className="flex shrink-0 items-center gap-1">
+                  {row.url ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => copy(row.url!, row.purpose)}
+                        className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-stone-200 hover:text-stone-900"
+                        aria-label={`Copy ${row.label} link`}
+                        title={`Copy ${row.label} link`}
+                        data-clipboard-text={row.url!}
+                      >
+                        {copied === row.purpose ? (
+                          <Check className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => rotate(row.purpose)}
+                        className="rounded-md p-1.5 text-stone-400 transition-colors hover:bg-stone-200 hover:text-stone-900"
+                        aria-label={`Regenerate ${row.label} link`}
+                        title="Regenerate (old link stops working)"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                      </button>
+                    </>
+                  ) : null}
+                </div>
               </div>
+            ))}
+            <div className="flex items-center justify-between gap-2 pt-1">
+              <Button variant="ghost" size="sm" onClick={copyMessage}>
+                Copy all links
+              </Button>
+              <p className="text-xs text-stone-400">Paste into WhatsApp or email</p>
             </div>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
+          </div>
+        ) : null}
+      </PortalModal>
+    </>
   );
 }

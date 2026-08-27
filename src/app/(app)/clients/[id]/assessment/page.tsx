@@ -8,6 +8,8 @@ import { ClipboardList } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+const toNum = (v: unknown): number | null => (v === null || v === undefined ? null : Number(v));
+
 export default async function AssessmentPage({
   params,
 }: {
@@ -48,35 +50,35 @@ export default async function AssessmentPage({
               <dl className="grid grid-cols-2 gap-x-8 gap-y-4 px-5 py-4 sm:grid-cols-4">
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Weight</dt>
-                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(a.weightKg))} kg</dd>
+                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(a.weightKg))} kg</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Goal weight</dt>
-                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(a.goalWeightKg))} kg</dd>
+                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(a.goalWeightKg))} kg</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Body fat</dt>
-                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(a.bodyFatPct))}%</dd>
+                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(a.bodyFatPct))}%</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Waist</dt>
-                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(a.waistCm))} cm</dd>
+                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(a.waistCm))} cm</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Chest</dt>
-                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(a.chestCm))} cm</dd>
+                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(a.chestCm))} cm</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Hips</dt>
-                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(a.hipsCm))} cm</dd>
+                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(a.hipsCm))} cm</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Arm</dt>
-                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(a.armCm))} cm</dd>
+                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(a.armCm))} cm</dd>
                 </div>
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Thigh</dt>
-                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(a.thighCm))} cm</dd>
+                  <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(a.thighCm))} cm</dd>
                 </div>
               </dl>
               {a.goalSummary ? (

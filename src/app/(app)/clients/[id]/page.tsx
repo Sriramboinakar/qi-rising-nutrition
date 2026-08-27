@@ -41,13 +41,16 @@ export default async function ClientOverviewPage({
   const latestAssessment = client.assessments[0];
   const latestCheckIn = client.checkIns[0];
 
+  const toNum = (v: unknown): number | null => (v === null || v === undefined ? null : Number(v));
+
   const nutritionSource: NutritionSummarySource = {
-    weightKg: latestAssessment?.weightKg !== null && latestAssessment?.weightKg !== undefined
-      ? Number(latestAssessment.weightKg)
-      : null,
-    heightCm: latestAssessment?.heightCm ?? client.heightCm
-      ? Number(latestAssessment?.heightCm ?? client.heightCm)
-      : null,
+    weightKg: toNum(latestAssessment?.weightKg),
+    heightCm:
+      latestAssessment?.heightCm != null
+        ? toNum(latestAssessment.heightCm)
+        : client.heightCm != null
+          ? toNum(client.heightCm)
+          : null,
     dateOfBirth: client.dateOfBirth,
     sex: client.sex,
     activityLevel: latestAssessment?.activityLevel ?? null,
@@ -146,19 +149,19 @@ export default async function ClientOverviewPage({
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Weight</dt>
-                <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(latestAssessment.weightKg))} kg</dd>
+                <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(latestAssessment.weightKg))} kg</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Goal weight</dt>
-                <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(latestAssessment.goalWeightKg))} kg</dd>
+                <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(latestAssessment.goalWeightKg))} kg</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Body fat</dt>
-                <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(latestAssessment.bodyFatPct))}%</dd>
+                <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(latestAssessment.bodyFatPct))}%</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Waist</dt>
-                <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(latestAssessment.waistCm))} cm</dd>
+                <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(latestAssessment.waistCm))} cm</dd>
               </div>
             </dl>
           ) : (
@@ -196,7 +199,7 @@ export default async function ClientOverviewPage({
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Weight</dt>
-                <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(Number(latestCheckIn.weightKg))} kg</dd>
+                <dd className="mt-0.5 text-sm text-stone-800">{formatNumber(toNum(latestCheckIn.weightKg))} kg</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">Adherence</dt>

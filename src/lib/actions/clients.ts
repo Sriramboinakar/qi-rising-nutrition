@@ -59,8 +59,8 @@ export async function createClientQuickLink(name?: string) {
   if (!session?.user) throw new Error("Not authenticated");
 
   const parts = (name ?? "").trim().split(/\s+/).filter(Boolean);
-  const firstName = parts[0] || "New Client";
-  const lastName = parts.slice(1).join(" ") || "";
+  const firstName = (parts[0] || "New Client").slice(0, 100);
+  const lastName = parts.slice(1).join(" ").slice(0, 100);
 
   const client = await prisma.client.create({
     data: {

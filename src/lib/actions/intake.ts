@@ -104,6 +104,9 @@ async function applyIntakeData(clientId: string, formData: FormData) {
   const firstName = String(formData.get("firstName") ?? "").trim();
   const lastName = String(formData.get("lastName") ?? "").trim();
   if (!firstName || !lastName) return { error: "First and last name are required." };
+  if (firstName.length > 100 || lastName.length > 100) {
+    return { error: "Names must be 100 characters or fewer." };
+  }
 
   const dateOfBirth = String(formData.get("dateOfBirth") ?? "");
   const sex = String(formData.get("sex") ?? "") || null;
