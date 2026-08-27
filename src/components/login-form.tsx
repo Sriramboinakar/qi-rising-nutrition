@@ -3,8 +3,9 @@
 import { useActionState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { loginAction } from "@/lib/actions/auth";
-import { Leaf, Lock, Mail } from "lucide-react";
+import { Lock, Mail } from "lucide-react";
 import { Button, Input, Label } from "@/components/ui";
+import { BrandLogo } from "@/components/brand-logo";
 
 export default function LoginForm() {
   const [state, formAction, pending] = useActionState(loginAction, {});
@@ -24,7 +25,7 @@ export default function LoginForm() {
         transition={{ duration: 0.4, delay: 0.1 }}
       >
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 shadow-lg shadow-brand-600/30">
-          <Leaf className="h-7 w-7 text-white" />
+          <BrandLogo className="h-8 w-8 text-white" />
         </div>
         <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
           Qi Rising Nutrition

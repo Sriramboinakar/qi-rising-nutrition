@@ -12,6 +12,7 @@ import {
 import { parseDateInput } from "@/lib/utils";
 import { auth } from "@/auth";
 import { logActivity } from "@/lib/activity";
+import { composeIntakeNotes } from "@/lib/questionnaire";
 import type { GoalCategory } from "@/generated/prisma/enums";
 
 /**
@@ -151,7 +152,7 @@ async function applyIntakeData(clientId: string, formData: FormData) {
         mealTiming: String(formData.get("mealTiming") ?? "") || null,
         sleepHours: num("sleepHours", formData),
         waterLiters: num("waterLiters", formData),
-        notes: String(formData.get("notes") ?? "") || null,
+        notes: composeIntakeNotes(formData),
       },
     });
 

@@ -54,7 +54,7 @@ export async function createClient(formData: FormData) {
  * intake link to share directly — no need to fill the full form first. The
  * client can later be completed manually or via the link.
  */
-export async function createClientQuickLink(name?: string) {
+export async function createClientQuickLink(name?: string, goal?: GoalCategory) {
   const session = await auth();
   if (!session?.user) throw new Error("Not authenticated");
 
@@ -66,6 +66,7 @@ export async function createClientQuickLink(name?: string) {
     data: {
       firstName,
       lastName,
+      category: goal ?? "FAT_LOSS",
       coachId: session.user.id,
     },
   });

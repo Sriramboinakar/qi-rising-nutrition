@@ -3,12 +3,24 @@
 import { useActionState } from "react";
 import { submitClientCheckIn } from "@/lib/actions/client-checkin";
 import { Button, Input, Label, Select, Textarea } from "@/components/ui";
+import { goalCheckinFocus } from "@/lib/questionnaire";
+import type { GoalCategory } from "@/generated/prisma/enums";
 
-export function ClientCheckInForm({ token, clientName }: { token: string; clientName: string }) {
+export function ClientCheckInForm({
+  token,
+  clientName,
+  clientGoal,
+}: {
+  token: string;
+  clientName: string;
+  clientGoal?: GoalCategory;
+}) {
   const [state, action, pending] = useActionState(
     (_prev: { error?: string } | null, formData: FormData) => submitClientCheckIn(token, formData),
     null
   );
+
+  const focusLabel = clientGoal ? goalCheckinFocus(clientGoal) : null;
 
   if (state && "ok" in state) {
     return (
@@ -85,6 +97,19 @@ export function ClientCheckInForm({ token, clientName }: { token: string; client
           placeholder="Challenges, wins, questions, cravings, anything you want to share"
         />
       </div>
+
+      {focusLabel ? (
+        <div className="rounded-xl bg-brand-50 px-4 py-3">
+          <Label htmlFor="goalFocus">This week&apos;s focus</Label>
+          <p className="mb-1.5 text-xs text-brand-700">{focusLabel}</p>
+          <Textarea
+            id="goalFocus"
+            name="goalFocus"
+            placeholder="A quick line or two is perfect"
+            rows={2}
+          />
+        </div>
+      ) : null}
 
       {state && "error" in state ? (
         <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{state.error}</p>

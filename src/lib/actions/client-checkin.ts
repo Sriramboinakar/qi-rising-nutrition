@@ -28,7 +28,10 @@ export async function submitClientCheckIn(token: string, formData: FormData) {
   const waterLiters = num("waterLiters", formData);
   const energyLevel = num("energyLevel", formData);
   const mood = num("mood", formData);
-  const notes = String(formData.get("notes") ?? "").trim() || null;
+  const notesRaw = String(formData.get("notes") ?? "").trim();
+  const goalFocus = String(formData.get("goalFocus") ?? "").trim();
+  const notes =
+    [goalFocus ? `This week's focus: ${goalFocus}` : "", notesRaw].filter(Boolean).join("\n\n") || null;
 
   const client = await prisma.client.findUnique({
     where: { id: clientId },

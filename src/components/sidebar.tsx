@@ -11,13 +11,13 @@ import {
   CalendarRange,
   Settings,
   UserCog,
-  Leaf,
   LogOut,
   Menu,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
+import { BrandLogo } from "@/components/brand-logo";
 import type { Role } from "@/generated/prisma/enums";
 
 type NavItem = {
@@ -113,7 +113,7 @@ function SidebarContent({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <Leaf className="h-5 w-5 text-white" />
+          <BrandLogo className="h-5 w-5 text-white" />
         </motion.div>
         <div className="leading-tight">
           <p className="text-sm font-semibold text-white">Qi Rising</p>
@@ -191,7 +191,7 @@ export function Sidebar({ name, email, role }: { name: string; email: string; ro
         </button>
         <div className="flex items-center gap-2">
           <div className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-600">
-            <Leaf className="h-3.5 w-3.5 text-white" />
+            <BrandLogo className="h-4 w-4 text-white" />
           </div>
           <span className="text-sm font-semibold text-stone-900">Qi Rising</span>
         </div>

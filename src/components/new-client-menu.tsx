@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { createClientQuickLink } from "@/lib/actions/clients";
 import { Button, Input, Label } from "@/components/ui";
 import { PortalModal } from "@/components/portal-modal";
+import { QUICK_GOALS } from "@/lib/questionnaire";
+import type { GoalCategory } from "@/generated/prisma/enums";
 import { Plus, Link2, Copy, Check, UserRoundPlus, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +20,7 @@ export function NewClientMenu({
 }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
+  const [goal, setGoal] = useState<GoalCategory>("FAT_LOSS");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<{ clientId: string; url: string } | null>(null);
@@ -30,7 +33,7 @@ export function NewClientMenu({
     setError(null);
     setResult(null);
     try {
-      const res = await createClientQuickLink(name);
+      const res = await createClientQuickLink(name, goal);
       setResult({ clientId: res.clientId, url: `${window.location.origin}/intake/${res.intakeToken}` });
       setCreated(true);
     } catch {
@@ -84,7 +87,27 @@ export function NewClientMenu({
       >
         {!result ? (
           <>
-            <div>
+            <p className="text-xs font-medium text-stone-500">1 · Pick a goal</p>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {QUICK_GOALS.map((g) => (
+                <button
+                  key={g.key}
+                  type="button"
+                  onClick={() => setGoal(g.key)}
+                  className={cn(
+                    "rounded-xl border p-2.5 text-left transition-colors cursor-pointer",
+                    goal === g.key
+                      ? "border-brand-500 bg-brand-50"
+                      : "border-stone-200 bg-white hover:border-stone-300"
+                  )}
+                >
+                  <span className="block text-sm font-semibold text-stone-900">{g.label}</span>
+                  <span className="block text-[11px] leading-snug text-stone-500">{g.tagline}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-4">
               <Label htmlFor="quick-client-name">Client name (optional)</Label>
               <Input
                 id="quick-client-name"
@@ -104,7 +127,7 @@ export function NewClientMenu({
               <Link2 className="h-4 w-4" /> {loading ? "Creating..." : "Generate intake link"}
             </Button>
             <p className="mt-2 text-xs text-stone-500">
-              Creates the client and gives you a link to send on WhatsApp.
+              Creates the client and gives you a link to send on WhatsApp — the form auto-fits their goal.
             </p>
           </>
         ) : (

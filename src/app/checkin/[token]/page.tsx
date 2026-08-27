@@ -22,7 +22,7 @@ export default async function ClientCheckInPage({
 
   const client = await prisma.client.findUnique({
     where: { id: clientId },
-    select: { id: true, firstName: true },
+    select: { id: true, firstName: true, category: true },
   });
   if (!client) notFound();
 
@@ -31,7 +31,7 @@ export default async function ClientCheckInPage({
       title="Weekly check-in"
       subtitle="A quick check-in helps your coach track your progress and adjust your plan."
     >
-      <ClientCheckInForm token={token} clientName={client.firstName} />
+      <ClientCheckInForm token={token} clientName={client.firstName} clientGoal={client.category} />
     </ClientPortalShell>
   );
 }

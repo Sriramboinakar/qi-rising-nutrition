@@ -1,4 +1,4 @@
-import { Leaf } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
 
 export function ClientPortalShell({
   title,
@@ -14,7 +14,7 @@ export function ClientPortalShell({
       <div className="w-full max-w-lg">
         <div className="mb-6 flex flex-col items-center text-center">
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-600 text-white">
-            <Leaf className="h-5 w-5" />
+            <BrandLogo className="h-6 w-6" />
           </div>
           <h1 className="mt-3 text-2xl font-semibold tracking-tight text-stone-900">{title}</h1>
           <p className="mt-1 text-sm text-stone-500">{subtitle}</p>

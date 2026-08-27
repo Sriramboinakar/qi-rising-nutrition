@@ -1,23 +1,29 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { submitIntake } from "@/lib/actions/intake";
 import { Button, Input, Label, Select, Textarea } from "@/components/ui";
 import { GOAL_CATEGORY_LABELS } from "@/lib/labels";
+import { goalIntakeGuidance, needsPostpartumQuestions } from "@/lib/questionnaire";
+import type { GoalCategory } from "@/generated/prisma/enums";
 
 export function IntakeForm({
   token,
   clientName,
   alreadySubmitted,
+  clientGoal,
 }: {
   token: string;
   clientName: string;
   alreadySubmitted?: boolean;
+  clientGoal?: GoalCategory;
 }) {
   const [state, action, pending] = useActionState(
     (_prev: { error?: string } | null, formData: FormData) => submitIntake(token, formData),
     null
   );
+  const [goal, setGoal] = useState<GoalCategory>(clientGoal ?? "FAT_LOSS");
+  const guidance = goalIntakeGuidance(goal);
 
   if (alreadySubmitted || (state && "ok" in state)) {
     return (
@@ -66,7 +72,12 @@ export function IntakeForm({
         </div>
         <div>
           <Label htmlFor="goal">Primary goal</Label>
-          <Select id="goal" name="goal" defaultValue="FAT_LOSS">
+          <Select
+            id="goal"
+            name="goal"
+            value={goal}
+            onChange={(e) => setGoal(e.target.value as GoalCategory)}
+          >
             {Object.entries(GOAL_CATEGORY_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
@@ -75,6 +86,10 @@ export function IntakeForm({
           </Select>
         </div>
       </div>
+
+      {guidance ? (
+        <p className="rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-800">{guidance}</p>
+      ) : null}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div>
@@ -179,6 +194,36 @@ export function IntakeForm({
           placeholder="Work schedule, stress, cooking habits, anything relevant"
         />
       </div>
+
+      {needsPostpartumQuestions(goal) ? (
+        <div className="space-y-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4">
+          <p className="text-sm font-semibold text-brand-900">Postpartum &amp; lactation</p>
+          <div>
+            <Label htmlFor="postpartumBreastfeeding">Are you currently breastfeeding? How long?</Label>
+            <Input
+              id="postpartumBreastfeeding"
+              name="postpartumBreastfeeding"
+              placeholder="e.g. Yes, exclusively for 3 months"
+            />
+          </div>
+          <div>
+            <Label htmlFor="postpartumNutrients">Iron, calcium &amp; healthy fats this week</Label>
+            <Textarea
+              id="postpartumNutrients"
+              name="postpartumNutrients"
+              placeholder="Any foods or supplements you have been able to keep up with"
+            />
+          </div>
+          <div>
+            <Label htmlFor="postpartumPelvic">Pelvic recovery concerns</Label>
+            <Textarea
+              id="postpartumPelvic"
+              name="postpartumPelvic"
+              placeholder="Any discomfort, prolapse symptoms or healing concerns"
+            />
+          </div>
+        </div>
+      ) : null}
 
       <div>
         <Label htmlFor="notes">Anything else?</Label>

@@ -18,7 +18,7 @@ export default async function IntakePage({ params }: { params: Promise<{ token: 
 
   const client = await prisma.client.findUnique({
     where: { id: clientId },
-    select: { id: true, firstName: true, intakeSubmittedAt: true },
+    select: { id: true, firstName: true, category: true, intakeSubmittedAt: true },
   });
   if (!client) notFound();
 
@@ -27,7 +27,12 @@ export default async function IntakePage({ params }: { params: Promise<{ token: 
       title="Welcome to Qi Rising"
       subtitle="Complete your intake so your coach can personalise your nutrition plan."
     >
-      <IntakeForm token={token} clientName={client.firstName} alreadySubmitted={Boolean(client.intakeSubmittedAt)} />
+      <IntakeForm
+        token={token}
+        clientName={client.firstName}
+        alreadySubmitted={Boolean(client.intakeSubmittedAt)}
+        clientGoal={client.category}
+      />
     </ClientPortalShell>
   );
 }
