@@ -73,7 +73,6 @@ export async function createClientQuickLink(name?: string) {
   const intakeToken = await getOrCreateAccessToken(client.id, "INTAKE");
   await logActivity(session.user.id, client.id, "client.created", `Created client ${firstName} ${lastName}`);
 
-  revalidatePath("/clients");
   return { clientId: client.id, intakeToken };
 }
 

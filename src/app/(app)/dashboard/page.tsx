@@ -13,11 +13,12 @@ import { Skeleton } from "@/components/skeleton";
 import { CountUp } from "@/components/count-up";
 import { SendCheckInLinkButton } from "@/components/send-checkin-link";
 import { NutritionOverview } from "@/components/dashboard/nutrition-overview";
+import { QuickActions } from "@/components/dashboard/quick-actions";
 import { cn, formatDate } from "@/lib/utils";
 import {
   Users,
+  Sparkles,
   CalendarClock,
-  AlertTriangle,
   ArrowUpRight,
   Activity,
   CheckCircle2,
@@ -48,18 +49,24 @@ export default async function DashboardPage() {
       value: stats.activeCount,
       icon: Users,
       accent: "bg-emerald-50 text-emerald-600",
+      micro: `You're coaching ${stats.activeCount} right now`,
+    },
+    {
+      label: "Checked in this week",
+      value: stats.checkedInThisWeek,
+      icon: Sparkles,
+      accent: "bg-amber-50 text-amber-600",
+      micro:
+        stats.checkedInThisWeek > 0
+          ? `${stats.checkedInThisWeek} client${stats.checkedInThisWeek === 1 ? "" : "s"} checked in — nice! 🌟`
+          : "No check-ins yet this week",
     },
     {
       label: "Open follow-ups",
       value: stats.openFollowUps,
       icon: CalendarClock,
-      accent: "bg-blue-50 text-blue-600",
-    },
-    {
-      label: "Overdue follow-ups",
-      value: stats.overdueFollowUps,
-      icon: AlertTriangle,
-      accent: "bg-red-50 text-red-600",
+      accent: "bg-sky-50 text-sky-600",
+      micro: "Follow-ups to schedule this week",
     },
   ];
 
@@ -80,42 +87,57 @@ export default async function DashboardPage() {
           description="Here is what needs your attention today."
         />
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {statCards.map((stat) => (
-            <Card key={stat.label} className={cn(GLASS_CARD, "p-5")}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-stone-500">{stat.label}</p>
-                  <CountUp
-                    value={stat.value}
-                    className="mt-1 inline-block text-3xl font-semibold tracking-tight text-stone-900 tabular-nums"
-                  />
-                </div>
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${stat.accent}`}>
-                  <stat.icon className="h-5 w-5" />
-                </div>
-              </div>
-            </Card>
-          ))}
+        <QuickActions />
 
-          <Suspense
-            fallback={
-              <Card className={cn(GLASS_CARD, "p-5")}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-stone-500">Needs attention</p>
-                    <p className="mt-1 text-3xl font-semibold tracking-tight text-stone-900">…</p>
+        <section className="space-y-3">
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-semibold tracking-tight text-stone-900">At a glance</h2>
+            <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700">
+              This week
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {statCards.map((stat) => (
+              <Card key={stat.label} className={cn(GLASS_CARD, "p-5")}>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-stone-500">{stat.label}</p>
+                    <CountUp
+                      value={stat.value}
+                      className="mt-1 block text-3xl font-semibold tracking-tight text-stone-900 tabular-nums"
+                    />
+                    <p className="mt-1 text-xs text-stone-400">{stat.micro}</p>
                   </div>
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-                    <Activity className="h-5 w-5" />
+                  <div
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${stat.accent}`}
+                  >
+                    <stat.icon className="h-5 w-5" />
                   </div>
                 </div>
               </Card>
-            }
-          >
-            <AttentionCountCard />
-          </Suspense>
-        </div>
+            ))}
+
+            <Suspense
+              fallback={
+                <Card className={cn(GLASS_CARD, "p-5")}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-stone-500">Needs attention</p>
+                      <p className="mt-1 text-3xl font-semibold tracking-tight text-stone-900">…</p>
+                      <p className="mt-1 text-xs text-stone-400">Checking…</p>
+                    </div>
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-500">
+                      <Activity className="h-5 w-5" />
+                    </div>
+                  </div>
+                </Card>
+              }
+            >
+              <AttentionCountCard />
+            </Suspense>
+          </div>
+        </section>
 
         <Suspense fallback={<Skeleton className="h-80 rounded-2xl" />}>
           <NutritionSection />
@@ -152,15 +174,18 @@ async function AttentionCountCard() {
 
   return (
     <Card className={cn(GLASS_CARD, "p-5")}>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-stone-500">Needs attention</p>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-stone-500">Needs attention</p>
           <CountUp
             value={attention.length}
-            className="mt-1 inline-block text-3xl font-semibold tracking-tight text-stone-900 tabular-nums"
+            className="mt-1 block text-3xl font-semibold tracking-tight text-stone-900 tabular-nums"
           />
+          <p className="mt-1 text-xs text-stone-400">
+            {attention.length === 0 ? "All clear — great work! ✨" : "A quick look keeps things on track"}
+          </p>
         </div>
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-500">
           <Activity className="h-5 w-5" />
         </div>
       </div>
@@ -172,7 +197,8 @@ async function AttentionSection() {
   const attention = await getDashboardAttention();
 
   return (
-    <Card className={cn(GLASS_CARD, "overflow-hidden")}>
+    <div id="needs-attention" className="scroll-mt-24">
+      <Card className={cn(GLASS_CARD, "overflow-hidden")}>
       <CardHeader
         title="Needs attention"
         subtitle={
@@ -244,7 +270,8 @@ async function AttentionSection() {
           })
         )}
       </div>
-    </Card>
+      </Card>
+    </div>
   );
 }
 

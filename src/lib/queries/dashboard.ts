@@ -4,15 +4,19 @@ import { startOfDay, endOfDay, addDays } from "date-fns";
 import { buildNutritionProfile } from "@/lib/nutrition";
 
 export async function getDashboardStats() {
-  const [activeCount, openFollowUps, overdueFollowUps] = await Promise.all([
+  const weekAgo = startOfDay(addDays(new Date(), -6));
+  const [activeCount, openFollowUps, overdueFollowUps, checkedInThisWeek] = await Promise.all([
     prisma.client.count({ where: { status: "ACTIVE" } }),
     prisma.followUp.count({ where: { status: "OPEN" } }),
     prisma.followUp.count({
       where: { status: "OPEN", dueDate: { lt: startOfDay(new Date()) } },
     }),
+    prisma.client.count({
+      where: { status: "ACTIVE", checkIns: { some: { checkInDate: { gte: weekAgo } } } },
+    }),
   ]);
 
-  return { activeCount, openFollowUps, overdueFollowUps };
+  return { activeCount, openFollowUps, overdueFollowUps, checkedInThisWeek };
 }
 
 export const getDashboardUpcoming = cache(async () => {
