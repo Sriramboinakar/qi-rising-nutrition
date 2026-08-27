@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import {
   getDashboardStats,
   getDashboardUpcoming,
+  getDashboardNutritionSnapshot,
 } from "@/lib/queries/dashboard";
 import { getDashboardAttention, type AttentionKind } from "@/lib/queries/attention";
 import { Badge, Button, Card, CardHeader, EmptyState, PageHeader } from "@/components/ui";
@@ -11,7 +12,8 @@ import { StaggerChildren } from "@/components/stagger-children";
 import { Skeleton } from "@/components/skeleton";
 import { CountUp } from "@/components/count-up";
 import { SendCheckInLinkButton } from "@/components/send-checkin-link";
-import { formatDate } from "@/lib/utils";
+import { NutritionOverview } from "@/components/dashboard/nutrition-overview";
+import { cn, formatDate } from "@/lib/utils";
 import {
   Users,
   CalendarClock,
@@ -23,6 +25,9 @@ import {
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+const GLASS_CARD =
+  "bg-white/70 backdrop-blur-xl border-white/70 shadow-[0_1px_2px_rgb(0,0,0,0.04),0_12px_32px_-16px_rgb(0,0,0,0.14)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgb(0,0,0,0.05),0_18px_40px_-16px_rgb(0,0,0,0.18)]";
 
 const KIND_META: Record<AttentionKind, { tone: "red" | "violet" | "amber" | "blue"; dot: string; label: string }> = {
   OVERDUE: { tone: "red", dot: "bg-red-500", label: "Overdue" },
@@ -59,74 +64,94 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <StaggerChildren stagger={0.04} className="space-y-8">
-      <PageHeader
-        title={`Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}, ${session.user.name?.split(" ")[0] ?? "Coach"}`}
-        description="Here is what needs your attention today."
+    <div className="relative">
+      <div
+        className="pointer-events-none absolute -top-24 right-[-6rem] h-72 w-72 rounded-full bg-brand-200/40 blur-3xl"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute top-44 left-[-6rem] h-64 w-64 rounded-full bg-sky-200/40 blur-3xl"
+        aria-hidden="true"
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {statCards.map((stat) => (
-          <Card key={stat.label} className="p-5 transition-shadow duration-200 hover:shadow-md">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-stone-500">{stat.label}</p>
-                <CountUp
-                  value={stat.value}
-                  className="mt-1 inline-block text-3xl font-semibold tracking-tight text-stone-900 tabular-nums"
-                />
-              </div>
-              <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${stat.accent}`}>
-                <stat.icon className="h-5 w-5" />
-              </div>
-            </div>
-          </Card>
-        ))}
+      <StaggerChildren stagger={0.04} className="relative space-y-8">
+        <PageHeader
+          title={`Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}, ${session.user.name?.split(" ")[0] ?? "Coach"}`}
+          description="Here is what needs your attention today."
+        />
 
-        <Suspense
-          fallback={
-            <Card className="p-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {statCards.map((stat) => (
+            <Card key={stat.label} className={cn(GLASS_CARD, "p-5")}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-stone-500">Needs attention</p>
-                  <p className="mt-1 text-3xl font-semibold tracking-tight text-stone-900">…</p>
+                  <p className="text-sm text-stone-500">{stat.label}</p>
+                  <CountUp
+                    value={stat.value}
+                    className="mt-1 inline-block text-3xl font-semibold tracking-tight text-stone-900 tabular-nums"
+                  />
                 </div>
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-                  <Activity className="h-5 w-5" />
+                <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${stat.accent}`}>
+                  <stat.icon className="h-5 w-5" />
                 </div>
               </div>
             </Card>
-          }
-        >
-          <AttentionCountCard />
+          ))}
+
+          <Suspense
+            fallback={
+              <Card className={cn(GLASS_CARD, "p-5")}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-stone-500">Needs attention</p>
+                    <p className="mt-1 text-3xl font-semibold tracking-tight text-stone-900">…</p>
+                  </div>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                    <Activity className="h-5 w-5" />
+                  </div>
+                </div>
+              </Card>
+            }
+          >
+            <AttentionCountCard />
+          </Suspense>
+        </div>
+
+        <Suspense fallback={<Skeleton className="h-80 rounded-2xl" />}>
+          <NutritionSection />
         </Suspense>
-      </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="xl:col-span-2">
-          <Suspense fallback={<Skeleton className="h-80 rounded-xl" />}>
-            <AttentionSection />
-          </Suspense>
-        </div>
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+          <div className="min-w-0 xl:col-span-2">
+            <Suspense fallback={<Skeleton className="h-80 rounded-2xl" />}>
+              <AttentionSection />
+            </Suspense>
+          </div>
 
-        <div className="space-y-6">
-          <Suspense fallback={<Skeleton className="h-44 rounded-xl" />}>
-            <UpcomingSection />
-          </Suspense>
-          <Suspense fallback={<Skeleton className="h-44 rounded-xl" />}>
-            <ActivitySection />
-          </Suspense>
+          <div className="min-w-0 space-y-6">
+            <Suspense fallback={<Skeleton className="h-44 rounded-2xl" />}>
+              <UpcomingSection />
+            </Suspense>
+            <Suspense fallback={<Skeleton className="h-44 rounded-2xl" />}>
+              <ActivitySection />
+            </Suspense>
+          </div>
         </div>
-      </div>
-    </StaggerChildren>
+      </StaggerChildren>
+    </div>
   );
+}
+
+async function NutritionSection() {
+  const snapshot = await getDashboardNutritionSnapshot();
+  return <NutritionOverview snapshot={snapshot} />;
 }
 
 async function AttentionCountCard() {
   const attention = await getDashboardAttention();
 
   return (
-    <Card className="p-5 transition-shadow duration-200 hover:shadow-md">
+    <Card className={cn(GLASS_CARD, "p-5")}>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-stone-500">Needs attention</p>
@@ -147,7 +172,7 @@ async function AttentionSection() {
   const attention = await getDashboardAttention();
 
   return (
-    <Card>
+    <Card className={cn(GLASS_CARD, "overflow-hidden")}>
       <CardHeader
         title="Needs attention"
         subtitle={
@@ -178,7 +203,7 @@ async function AttentionSection() {
             return (
               <div
                 key={`${item.clientId}-${item.kind}`}
-                className="flex flex-wrap items-center justify-between gap-3 px-5 py-4"
+                className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 transition-colors hover:bg-white/60"
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${meta.dot}`} aria-hidden="true" />
@@ -227,7 +252,7 @@ async function UpcomingSection() {
   const { upcoming } = await getDashboardUpcoming();
 
   return (
-    <Card>
+    <Card className={cn(GLASS_CARD, "overflow-hidden")}>
       <CardHeader title="Upcoming follow-ups" subtitle="Next 7 days" />
       <div className="divide-y divide-stone-100">
         {upcoming.length === 0 ? (
@@ -237,7 +262,7 @@ async function UpcomingSection() {
             <Link
               key={f.id}
               href={`/clients/${f.clientId}/followups`}
-              className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-stone-50"
+              className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-white/60"
             >
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                 <Clock className="h-4 w-4" />
@@ -260,7 +285,7 @@ async function ActivitySection() {
   const { recentActivity } = await getDashboardUpcoming();
 
   return (
-    <Card>
+    <Card className={cn(GLASS_CARD, "overflow-hidden")}>
       <CardHeader title="Recent activity" subtitle="Latest changes across clients" />
       <div className="divide-y divide-stone-100">
         {recentActivity.length === 0 ? (
