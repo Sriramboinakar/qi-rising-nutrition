@@ -76,7 +76,21 @@ export async function submitClientCheckIn(token: string, formData: FormData) {
 
   const summary = buildWeeklySummary({ weightKg, adherencePct, sleepHours, waterLiters, energyLevel, mood, notes }, last, prev);
 
-  await prisma.checkIn.create({
+  // Client-submitted progress photos (base64 data URLs, resized client-side).
+  // Defense in depth: reject if the combined payload exceeds 2MB in case the
+  // client-side resize is bypassed.
+  const photos: string[] = ["photo0", "photo1", "photo2"]
+    .map((key) => String(formData.get(key) ?? "").trim())
+    .filter((v) => v.length > 0);
+  if (photos.length > 3) {
+    return { error: "You can add up to 3 photos per check-in." };
+  }
+  const totalPhotoBytes = photos.reduce((sum, p) => sum + Buffer.byteLength(p, "utf8"), 0);
+  if (totalPhotoBytes > 2 * 1024 * 1024) {
+    return { error: "Photos are too large. Please try smaller photos." };
+  }
+
+  const checkIn = await prisma.checkIn.create({
     data: {
       clientId,
       weekNumber,
@@ -90,6 +104,17 @@ export async function submitClientCheckIn(token: string, formData: FormData) {
       summary,
     },
   });
+
+  if (photos.length > 0) {
+    await prisma.progressPhoto.createMany({
+      data: photos.map((url) => ({
+        clientId,
+        checkInId: checkIn.id,
+        url,
+        type: "FRONT",
+      })),
+    });
+  }
 
   await logActivity(
     client.coachId,

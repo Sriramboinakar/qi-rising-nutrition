@@ -1,4 +1,4 @@
-import { BrandLogo } from "@/components/brand-logo";
+import { PortalBrandBand } from "@/components/portal-brand-band";
 
 export function ClientPortalShell({
   title,
@@ -10,17 +10,17 @@ export function ClientPortalShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-full flex-1 flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg">
-        <div className="mb-6 flex flex-col items-center text-center">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-600 text-white">
-            <BrandLogo className="h-6 w-6" />
+    <div className="flex min-h-screen flex-1 flex-col bg-stone-50">
+      <PortalBrandBand />
+      <div className="flex flex-1 flex-col items-center justify-center px-4 py-8">
+        <div className="w-full max-w-lg">
+          <div className="mb-5 text-center">
+            <h1 className="text-2xl font-semibold tracking-tight text-stone-900">{title}</h1>
+            <p className="mt-1 text-sm text-stone-500">{subtitle}</p>
           </div>
-          <h1 className="mt-3 text-2xl font-semibold tracking-tight text-stone-900">{title}</h1>
-          <p className="mt-1 text-sm text-stone-500">{subtitle}</p>
-        </div>
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
-          {children}
+          <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+            {children}
+          </div>
         </div>
       </div>
     </div>

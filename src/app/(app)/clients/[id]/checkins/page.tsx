@@ -18,7 +18,10 @@ export default async function CheckInsPage({
   const client = await prisma.client.findUnique({
     where: { id },
     include: {
-      checkIns: { orderBy: { weekNumber: "desc" } },
+      checkIns: {
+        orderBy: { weekNumber: "desc" },
+        include: { photos: { orderBy: { date: "asc" }, select: { url: true } } },
+      },
     },
   });
 
@@ -68,6 +71,7 @@ export default async function CheckInsPage({
                 summary: c.summary,
                 reviewedAt: c.reviewedAt ? c.reviewedAt.toISOString() : null,
                 followUpDate: c.followUpDate ? c.followUpDate.toISOString() : null,
+                photos: c.photos.map((p) => p.url),
               }}
             />
           ))

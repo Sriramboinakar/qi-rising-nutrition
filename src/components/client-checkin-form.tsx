@@ -1,10 +1,54 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { submitClientCheckIn } from "@/lib/actions/client-checkin";
 import { Button, Input, Label, Select, Textarea } from "@/components/ui";
 import { goalCheckinFocus } from "@/lib/questionnaire";
+import { Camera, X } from "lucide-react";
 import type { GoalCategory } from "@/generated/prisma/enums";
+
+const MAX_PHOTOS = 3;
+const MAX_EDGE = 1600;
+const MAX_PHOTO_BYTES = 600 * 1024;
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Could not read image"));
+    reader.readAsDataURL(file);
+  });
+}
+
+/** Resize to ≤1600px longest edge, JPEG, retrying lower quality until ≤600KB. */
+async function resizeToJpeg(file: File): Promise<string> {
+  const dataUrl = await readFileAsDataUrl(file);
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const el = new Image();
+    el.onload = () => resolve(el);
+    el.onerror = () => reject(new Error("Could not read image"));
+    el.src = dataUrl;
+  });
+
+  const scale = Math.min(1, MAX_EDGE / Math.max(img.naturalWidth, img.naturalHeight));
+  const w = Math.max(1, Math.round(img.naturalWidth * scale));
+  const h = Math.max(1, Math.round(img.naturalHeight * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas not supported");
+
+  ctx.drawImage(img, 0, 0, w, h);
+
+  const prefix = "data:image/jpeg;base64,";
+  for (const quality of [0.8, 0.6, 0.5]) {
+    const out = canvas.toDataURL("image/jpeg", quality);
+    const bytes = Math.round((out.length - prefix.length) * 0.75);
+    if (bytes <= MAX_PHOTO_BYTES) return out;
+  }
+  throw new Error("Photo is too large even after resizing.");
+}
 
 export function ClientCheckInForm({
   token,
@@ -21,6 +65,8 @@ export function ClientCheckInForm({
   );
 
   const focusLabel = clientGoal ? goalCheckinFocus(clientGoal) : null;
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [photoError, setPhotoError] = useState<string | null>(null);
 
   if (state && "ok" in state) {
     return (
@@ -38,6 +84,20 @@ export function ClientCheckInForm({
         </div>
       </div>
     );
+  }
+
+  async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []).slice(0, MAX_PHOTOS - photos.length);
+    setPhotoError(null);
+    for (const file of files) {
+      try {
+        const resized = await resizeToJpeg(file);
+        setPhotos((prev) => (prev.length >= MAX_PHOTOS ? prev : [...prev, resized]));
+      } catch {
+        setPhotoError("This photo is too large. Please try a smaller photo.");
+      }
+    }
+    e.target.value = "";
   }
 
   return (
@@ -102,14 +162,53 @@ export function ClientCheckInForm({
         <div className="rounded-xl bg-brand-50 px-4 py-3">
           <Label htmlFor="goalFocus">This week&apos;s focus</Label>
           <p className="mb-1.5 text-xs text-brand-700">{focusLabel}</p>
-          <Textarea
-            id="goalFocus"
-            name="goalFocus"
-            placeholder="A quick line or two is perfect"
-            rows={2}
-          />
+          <Textarea id="goalFocus" name="goalFocus" placeholder="A quick line or two is perfect" rows={2} />
         </div>
       ) : null}
+
+      <div className="rounded-xl border border-stone-200 p-4">
+        <p className="text-sm font-semibold text-stone-800">Progress photos (optional)</p>
+        <p className="mt-0.5 text-xs text-stone-500">
+          Share only what you&apos;re comfortable with — Shevvy sees these privately.
+        </p>
+        <div className="mt-3 flex flex-wrap items-start gap-3">
+          {photos.map((photo, i) => (
+            <div key={i} className="relative">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={photo} alt={`Progress photo ${i + 1}`} className="h-20 w-20 rounded-lg object-cover" />
+              <button
+                type="button"
+                onClick={() => setPhotos((prev) => prev.filter((_, j) => j !== i))}
+                className="absolute -right-3 -top-3 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-stone-900 text-white shadow-sm transition-colors hover:bg-stone-700"
+                aria-label={`Remove photo ${i + 1}`}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+          {photos.length < MAX_PHOTOS ? (
+            <label className="flex h-20 w-20 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-stone-300 text-stone-400 transition-colors hover:border-brand-400 hover:text-brand-500">
+              <Camera className="h-6 w-6" />
+              <span className="mt-1 text-[10px] font-medium">Add</span>
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                multiple
+                className="sr-only"
+                onChange={onFiles}
+              />
+            </label>
+          ) : null}
+        </div>
+        <p className="mt-2 text-xs text-stone-400">
+          {photos.length}/{MAX_PHOTOS} photos added
+        </p>
+        {photoError ? <p className="mt-2 text-sm text-red-600">{photoError}</p> : null}
+        {photos.map((photo, i) => (
+          <input key={i} type="hidden" name={`photo${i}`} value={photo} />
+        ))}
+      </div>
 
       {state && "error" in state ? (
         <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{state.error}</p>

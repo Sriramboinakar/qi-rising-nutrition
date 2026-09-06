@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { resolveAccessToken } from "@/lib/access-token";
 import { ClientPortalShell } from "@/components/client-portal-shell";
+import { PlanPrintButton } from "@/components/plan-print-button";
 import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -48,6 +49,10 @@ export default async function ClientPlanPage({
         </div>
       ) : (
         <div className="space-y-5">
+          <div className="flex justify-end">
+            <PlanPrintButton />
+          </div>
+
           {plan.calories || plan.proteinG || plan.carbsG || plan.fatG ? (
             <div className="grid grid-cols-4 gap-3 rounded-xl bg-stone-50 p-4 text-center">
               {plan.calories !== null ? (
@@ -84,7 +89,7 @@ export default async function ClientPlanPage({
           {plan.meals.length > 0 ? (
             <div className="space-y-3">
               {plan.meals.map((meal) => (
-                <div key={meal.id} className="rounded-xl border border-stone-200 p-4">
+                <div key={meal.id} className="break-inside-avoid rounded-xl border border-stone-200 p-4">
                   <div className="flex items-center justify-between">
                     <p className="font-medium text-stone-900">{meal.mealName}</p>
                     {meal.calories !== null ? (

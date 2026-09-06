@@ -278,6 +278,7 @@ model CheckIn {
   updatedAt     DateTime      @updatedAt
 
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  photos ProgressPhoto[]
 
   @@unique([clientId, weekNumber])
   @@index([clientId])
@@ -311,14 +312,23 @@ model ProgressEntry {
 model ProgressPhoto {
   id       String    @id @default(cuid())
   clientId String
+  // Optional: attach a progress photo to a weekly check-in submission.
+  checkInId String?
   date     DateTime  @default(now())
+  // Data URL (base64) for client-submitted check-in photos. Coach-uploaded
+  // photos may use a remote URL.
+  // TODO: If storage grows past ~500MB or clients start sending 5+ photos/week,
+  // migrate to Vercel Blob — swap ProgressPhoto.url from data URL to blob URL,
+  // keep the schema.
   url      String
   type     PhotoType @default(FRONT)
   note     String?
 
-  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  client  Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  checkIn CheckIn? @relation(fields: [checkInId], references: [id], onDelete: Cascade)
 
   @@index([clientId])
+  @@index([checkInId])
   @@index([date])
 }
 

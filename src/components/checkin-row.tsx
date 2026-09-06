@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { CheckInForm } from "@/components/checkin-form";
 import { Badge, Button } from "@/components/ui";
+import { PortalModal } from "@/components/portal-modal";
 import { CHECKIN_STATUS_LABELS, CHECKIN_STATUS_TONES } from "@/lib/labels";
 import { formatDate, formatNumber } from "@/lib/utils";
 import { markCheckInReviewed } from "@/lib/actions/checkins";
@@ -22,6 +23,7 @@ export function CheckInRow({
   const [editing, setEditing] = useState(false);
   const [reviewed, setReviewed] = useState(Boolean(checkIn.reviewedAt));
   const [marking, setMarking] = useState(false);
+  const [viewer, setViewer] = useState<number | null>(null);
   const reduced = useReducedMotion();
 
   async function markReviewed() {
@@ -93,6 +95,32 @@ export function CheckInRow({
         </p>
       ) : null}
 
+      {checkIn.photos && checkIn.photos.length > 0 ? (
+        <div className="mt-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-stone-400">Progress photos</p>
+          <div className="mt-1 flex flex-wrap gap-2">
+            {checkIn.photos.map((url, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setViewer(i)}
+                className="overflow-hidden rounded-lg cursor-pointer"
+                aria-label={`View progress photo ${i + 1}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={url}
+                  alt={`Progress photo ${i + 1}`}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-16 w-16 object-cover transition-transform hover:scale-105"
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       <AnimatePresence initial={false}>
         {editing ? (
           <motion.div
@@ -109,6 +137,20 @@ export function CheckInRow({
           </motion.div>
         ) : null}
       </AnimatePresence>
+    <PortalModal
+        open={viewer !== null}
+        onClose={() => setViewer(null)}
+        title={viewer !== null ? `Progress photo ${viewer + 1} of ${checkIn.photos?.length ?? 0}` : undefined}
+      >
+        {viewer !== null && checkIn.photos ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={checkIn.photos[viewer]}
+            alt="Progress photo"
+            className="mx-auto max-h-[70vh] w-auto max-w-full rounded-lg"
+          />
+        ) : null}
+      </PortalModal>
     </div>
   );
 }

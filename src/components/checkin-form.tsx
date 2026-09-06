@@ -25,6 +25,7 @@ export type SerializableCheckIn = {
   summary: string | null;
   reviewedAt: string | null;
   followUpDate: string | null;
+  photos: string[];
 };
 
 function toInputDate(value: Date | string | null | undefined): string {
