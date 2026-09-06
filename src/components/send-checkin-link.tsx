@@ -32,7 +32,7 @@ export function SendCheckInLinkButton({ clientId }: { clientId: string }) {
         type="button"
         onClick={send}
         disabled={loading}
-        className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-brand-50 px-3 text-xs font-medium text-brand-700 transition-colors hover:bg-brand-100 disabled:opacity-50 cursor-pointer"
+        className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-brand-50 px-3 text-xs font-medium text-brand-700 transition-colors hover:bg-brand-100 disabled:opacity-50 sm:h-8 sm:min-h-0 cursor-pointer"
       >
         {done ? (
           <>

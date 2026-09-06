@@ -173,18 +173,18 @@ export function Sidebar({ name, email, role }: { name: string; email: string; ro
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden h-screen w-64 shrink-0 lg:block">
+      <aside className="hidden h-screen w-64 shrink-0 md:block">
         <div className="fixed inset-y-0 left-0 w-64 bg-sidebar-bg">
           <SidebarContent name={name} email={email} role={role} />
         </div>
       </aside>
 
       {/* Mobile top bar */}
-      <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-stone-200 bg-white/95 px-4 backdrop-blur lg:hidden">
+      <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-stone-200 bg-white/95 px-4 backdrop-blur md:hidden">
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-stone-600 transition-colors hover:bg-stone-100"
+          className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-lg text-stone-600 transition-colors hover:bg-stone-100"
           aria-label="Open navigation"
         >
           <Menu className="h-5 w-5" />
@@ -203,7 +203,7 @@ export function Sidebar({ name, email, role }: { name: string; email: string; ro
       {/* Mobile drawer */}
       <AnimatePresence>
         {open ? (
-          <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="fixed inset-0 z-50 md:hidden">
             <motion.div
               className="absolute inset-0 bg-black/50"
               initial={reduced ? false : { opacity: 0 }}
@@ -223,7 +223,7 @@ export function Sidebar({ name, email, role }: { name: string; email: string; ro
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg text-sidebar-fg transition-colors hover:bg-white/5 hover:text-white cursor-pointer"
+                className="absolute right-3 top-3 flex h-11 w-11 cursor-pointer items-center justify-center rounded-lg text-sidebar-fg transition-colors hover:bg-white/5 hover:text-white"
                 aria-label="Close navigation"
               >
                 <X className="h-5 w-5" />

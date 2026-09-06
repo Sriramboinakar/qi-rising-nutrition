@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -18,6 +18,17 @@ export const metadata: Metadata = {
     template: "%s — Qi Rising Nutrition",
   },
   description: "Private nutrition coaching management platform",
+  icons: {
+    icon: "/icon.svg",
+    apple: [{ url: "/apple-touch-icon.png" }],
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#2E5A44",
 };
 
 import type { ReactNode } from "react";

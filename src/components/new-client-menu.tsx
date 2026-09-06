@@ -140,7 +140,7 @@ export function NewClientMenu({
                 readOnly
                 value={result.url}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-9 w-full rounded-lg border border-stone-300 bg-stone-50 px-3 text-xs text-stone-600 focus:outline-none"
+                className="h-9 w-full rounded-lg border border-stone-300 bg-stone-50 px-3 text-sm text-stone-600 focus:outline-none"
               />
               <button
                 type="button"

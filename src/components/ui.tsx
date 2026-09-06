@@ -29,7 +29,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer",
+        "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer min-h-11 sm:min-h-0",
         variants[variant],
         sizes[size],
         className
@@ -49,7 +49,7 @@ export function Label({ children, htmlFor, className }: { children: ReactNode; h
 }
 
 const inputBase =
-  "h-10 w-full rounded-lg border bg-white px-3 text-sm text-stone-900 placeholder:text-stone-400 shadow-sm transition-all duration-150 focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed";
+  "h-10 w-full rounded-lg border bg-white px-3 text-base text-stone-900 placeholder:text-stone-400 shadow-sm transition-all duration-150 focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed sm:text-sm";
 
 export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return (
