@@ -53,12 +53,12 @@ export function ProgramForm({ mode, program }: { mode: "create" | "edit"; progra
       </div>
 
       {mode === "edit" && program ? (
-        <label className="flex items-center gap-2 text-sm text-stone-600">
+        <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-stone-600">
           <input
             type="checkbox"
             name="isActive"
             defaultChecked={program.isActive}
-            className="h-4 w-4 rounded border-stone-300 accent-brand-600"
+            className="h-5 w-5 rounded border-stone-300 accent-brand-600"
           />
           Active (available for new clients)
         </label>

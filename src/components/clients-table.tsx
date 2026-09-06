@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { bulkDeleteClients } from "@/lib/actions/clients";
+import { getMessageTemplates } from "@/lib/actions/messages";
 import { isTestClientEmail } from "@/lib/test-data";
 import { Badge, Button } from "@/components/ui";
 import { PortalModal } from "@/components/portal-modal";
@@ -26,10 +27,11 @@ export type ClientRow = {
 
 const PAGE_SIZE = 25;
 
-function whatsappHref(client: ClientRow): string {
-  const msg = `Hi ${client.firstName || "there"}! Quick check-in from Qi Rising Nutrition.`;
+function whatsappHref(client: ClientRow, greetingTemplate: string): string {
+  const greeting = greetingTemplate || "Hi {name}! Quick check-in from Qi Rising Nutrition.";
+  const text = greeting.replace(/\{name\}/g, client.firstName).trim();
   const digits = (client.phone ?? "").replace(/\D/g, "");
-  return `https://wa.me/${digits}?text=${encodeURIComponent(msg)}`;
+  return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
 }
 
 export function ClientsTable({ clients }: { clients: ClientRow[] }) {
@@ -39,6 +41,13 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [visible, setVisible] = useState(PAGE_SIZE);
+  const [greetingTemplate, setGreetingTemplate] = useState("");
+
+  useEffect(() => {
+    getMessageTemplates()
+      .then((t) => setGreetingTemplate(t.greeting))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     setSelected(new Set());
@@ -215,7 +224,7 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
                   </p>
                 </div>
                 <a
-                  href={whatsappHref(client)}
+                  href={whatsappHref(client, greetingTemplate)}
                   target="_blank"
                   rel="noreferrer"
                   onClick={(e) => e.stopPropagation()}

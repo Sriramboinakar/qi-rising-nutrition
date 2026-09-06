@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClientQuickLink } from "@/lib/actions/clients";
+import { getMessageTemplates } from "@/lib/actions/messages";
+import { whatsappShareUrl } from "@/lib/messages";
 import { Button, Input, Label } from "@/components/ui";
 import { PortalModal } from "@/components/portal-modal";
 import { QUICK_GOALS } from "@/lib/questionnaire";
@@ -26,7 +28,14 @@ export function NewClientMenu({
   const [result, setResult] = useState<{ clientId: string; url: string } | null>(null);
   const [created, setCreated] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [intakeTemplate, setIntakeTemplate] = useState("");
   const router = useRouter();
+
+  useEffect(() => {
+    getMessageTemplates()
+      .then((t) => setIntakeTemplate(t.intake))
+      .catch(() => {});
+  }, []);
 
   async function generate() {
     setLoading(true);
@@ -62,11 +71,7 @@ export function NewClientMenu({
     }
   }
 
-  const whatsappUrl = result
-    ? `https://wa.me/?text=${encodeURIComponent(
-        `Hi! Please complete your Qi Rising Nutrition intake here — it takes a few minutes: ${result.url}`
-      )}`
-    : "";
+  const whatsappUrl = result ? whatsappShareUrl(intakeTemplate, result.url) : "";
 
   return (
     <>

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { Button, Card, CardHeader, Input, Label, PageHeader } from "@/components/ui";
 import { saveSettings } from "@/lib/actions/settings";
 import { TestDataCleanup } from "@/components/test-data-cleanup";
+import { MessageTemplatesForm } from "@/components/message-templates-form";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,16 @@ export default async function SettingsPage() {
             ))}
             <Button type="submit">Save settings</Button>
           </form>
+        </div>
+      </Card>
+
+      <Card className="max-w-2xl">
+        <CardHeader
+          title="Messages"
+          subtitle="Reusable WhatsApp message templates used by the share buttons. {link} is replaced with the real link, {name} with the client's first name."
+        />
+        <div className="px-5 py-5">
+          <MessageTemplatesForm />
         </div>
       </Card>
 

@@ -44,20 +44,20 @@ export function UserRow({
 
   return (
     <div className="border-b border-stone-100 px-5 py-4 last:border-0">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-stone-100 text-sm font-semibold text-stone-600">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stone-100 text-sm font-semibold text-stone-600">
             {user.name.charAt(0).toUpperCase()}
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-medium text-stone-900">
               {user.name}
               {isSelf ? <span className="ml-2 text-xs text-stone-400">(you)</span> : null}
             </p>
-            <p className="text-xs text-stone-500">{user.email}</p>
+            <p className="truncate text-xs text-stone-500">{user.email}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge tone={user.role === "SUPER_ADMIN" ? "violet" : "blue"}>
             {ROLE_LABELS[user.role] ?? user.role}
           </Badge>

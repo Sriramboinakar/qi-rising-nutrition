@@ -173,8 +173,8 @@ async function GoalCard() {
       <CardHeader title="Clients by goal" />
       <div className="flex flex-wrap gap-2 px-5 py-5">
         {categoryGroups.map((g) => (
-          <Link key={g.category} href={`/clients?category=${g.category}`}>
-            <Badge tone="blue" className="cursor-pointer py-1.5">
+          <Link key={g.category} href={`/clients?category=${g.category}`} className="inline-flex min-h-11 items-center">
+            <Badge tone="blue" className="cursor-pointer">
               {GOAL_CATEGORY_LABELS[g.category] ?? g.category} · {g._count._all}
             </Badge>
           </Link>

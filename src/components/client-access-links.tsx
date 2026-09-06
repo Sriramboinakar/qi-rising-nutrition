@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getClientAccessLinks, regenerateClientAccessLink } from "@/lib/actions/intake";
+import { getMessageTemplates } from "@/lib/actions/messages";
+import { whatsappShareUrl } from "@/lib/messages";
 import { Button, Badge } from "@/components/ui";
 import { PortalModal } from "@/components/portal-modal";
 import { Link2, Copy, Check, RefreshCw, MessageCircle } from "lucide-react";
@@ -24,6 +26,13 @@ export function ClientAccessLinks({ clientId }: { clientId: string }) {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [intakeTemplate, setIntakeTemplate] = useState("");
+
+  useEffect(() => {
+    getMessageTemplates()
+      .then((t) => setIntakeTemplate(t.intake))
+      .catch(() => {});
+  }, []);
 
   async function loadLinks() {
     setLoading(true);
@@ -187,11 +196,10 @@ export function ClientAccessLinks({ clientId }: { clientId: string }) {
                 </Button>
                 {rows.find((r) => r.purpose === "INTAKE")?.url ? (
                   <a
-                    href={`https://wa.me/?text=${encodeURIComponent(
-                      `Hi! Please complete your Qi Rising Nutrition intake here — it takes a few minutes: ${
-                        rows.find((r) => r.purpose === "INTAKE")?.url
-                      }`
-                    )}`}
+                    href={whatsappShareUrl(
+                      intakeTemplate,
+                      rows.find((r) => r.purpose === "INTAKE")?.url ?? ""
+                    )}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-[#25D366] px-3 text-xs font-semibold text-white transition-opacity hover:opacity-90 sm:h-8 sm:min-h-0"

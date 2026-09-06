@@ -34,7 +34,7 @@ export function UserForm() {
         </div>
         <div>
           <Label htmlFor="password">Password</Label>
-          <Input id="password" name="password" type="password" required minLength={8} />
+          <Input id="password" name="password" type="password" required minLength={8} autoComplete="new-password" />
         </div>
         <div>
           <Label htmlFor="role">Role</Label>
