@@ -71,7 +71,7 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative overflow-x-clip">
       <div
         className="pointer-events-none absolute -top-24 right-[-6rem] h-72 w-72 rounded-full bg-brand-200/40 blur-3xl"
         aria-hidden="true"

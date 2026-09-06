@@ -68,7 +68,7 @@ export function PortalModal({
             aria-hidden="true"
           />
           <motion.div
-            className="relative z-10 max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-t-2xl border border-white/70 bg-white p-5 shadow-2xl shadow-stone-900/20 sm:rounded-2xl"
+            className="relative z-10 max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-x-hidden overflow-y-auto rounded-t-2xl border border-white/70 bg-white px-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] pt-5 shadow-2xl shadow-stone-900/20 sm:rounded-2xl"
             initial={reduced ? false : { opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduced ? undefined : { opacity: 0, y: 16, scale: 0.98 }}

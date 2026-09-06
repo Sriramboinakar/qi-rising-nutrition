@@ -71,7 +71,7 @@ export function ShareClientLink({ clientId }: { clientId: string }) {
                 readOnly
                 value={url}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-9 w-full rounded-lg border border-stone-300 bg-stone-50 px-3 text-xs text-stone-600 focus:outline-none"
+                className="h-9 min-w-0 flex-1 rounded-lg border border-stone-300 bg-stone-50 px-3 text-xs text-stone-600 focus:outline-none"
               />
               <button
                 type="button"
