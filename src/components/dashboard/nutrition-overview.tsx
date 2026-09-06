@@ -81,7 +81,7 @@ function DailyAvgCard({ snapshot }: { snapshot: DashboardNutritionSnapshot }) {
     return (
       <GlassCard title="Daily Client Avg" subtitle="What your active clients aim for each day">
         <p className="py-10 text-center text-sm text-stone-400">
-          Add height, weight and activity to your clients to see their daily targets here.
+          No nutrition targets set yet. Open a client to set their daily targets.
         </p>
       </GlassCard>
     );
@@ -129,7 +129,9 @@ function ClientLookCard({ snapshot }: { snapshot: DashboardNutritionSnapshot }) 
   return (
     <GlassCard title="Quick look" subtitle="Calorie targets by client">
       {snapshot.top.length === 0 ? (
-        <p className="py-10 text-center text-sm text-stone-400">No calorie targets yet.</p>
+        <p className="py-10 text-center text-sm text-stone-400">
+          No nutrition targets set yet. Open a client to set their daily targets.
+        </p>
       ) : (
         <ul className="space-y-3">
           {snapshot.top.map((row) => {

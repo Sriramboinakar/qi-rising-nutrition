@@ -68,47 +68,23 @@ export function NutritionSummary({ source }: { source: NutritionSummarySource })
           <Row label="TDEE" value={profile.tdee !== null ? `${profile.tdee} kcal` : "—"} source="calc" />
           <Row
             label="Calorie target"
-            value={
-              hasOverride
-                ? `${source.calorieTarget} kcal`
-                : profile.calorieTarget !== null
-                  ? `${profile.calorieTarget} kcal`
-                  : "—"
-            }
-            source={hasOverride ? "override" : "calc"}
+            value={hasOverride ? `${source.calorieTarget} kcal` : "—"}
+            source={hasOverride ? "override" : "none"}
           />
           <Row
             label="Protein"
-            value={
-              hasOverride
-                ? `${source.proteinTargetG ?? "—"} g`
-                : profile.proteinG !== null
-                  ? `${profile.proteinG} g`
-                  : "—"
-            }
-            source={hasOverride ? "override" : "calc"}
+            value={hasOverride ? `${source.proteinTargetG ?? "—"} g` : "—"}
+            source={hasOverride ? "override" : "none"}
           />
           <Row
             label="Carbs"
-            value={
-              hasOverride
-                ? `${source.carbsTargetG ?? "—"} g`
-                : profile.carbsG !== null
-                  ? `${profile.carbsG} g`
-                  : "—"
-            }
-            source={hasOverride ? "override" : "calc"}
+            value={hasOverride ? `${source.carbsTargetG ?? "—"} g` : "—"}
+            source={hasOverride ? "override" : "none"}
           />
           <Row
             label="Fat"
-            value={
-              hasOverride
-                ? `${source.fatTargetG ?? "—"} g`
-                : profile.fatG !== null
-                  ? `${profile.fatG} g`
-                  : "—"
-            }
-            source={hasOverride ? "override" : "calc"}
+            value={hasOverride ? `${source.fatTargetG ?? "—"} g` : "—"}
+            source={hasOverride ? "override" : "none"}
           />
         </dl>
       )}

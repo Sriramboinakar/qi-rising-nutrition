@@ -1,7 +1,6 @@
 import { cache } from "react";
 import { prisma } from "@/lib/db";
 import { startOfDay, endOfDay, addDays } from "date-fns";
-import { buildNutritionProfile } from "@/lib/nutrition";
 
 export async function getDashboardStats() {
   const weekAgo = startOfDay(addDays(new Date(), -6));
@@ -61,8 +60,8 @@ export type DashboardNutritionSnapshot = {
 
 /**
  * Aggregate daily calorie + macro targets across active clients for the
- * dashboard widgets. Uses each client's latest assessment + profile, with
- * coach-set nutrition overrides taking precedence over calculated values.
+ * dashboard widgets. The coach-set nutrition overrides are the ONLY source
+ * of truth — calculated estimates are never used as targets.
  */
 export async function getDashboardNutritionSnapshot(): Promise<DashboardNutritionSnapshot> {
   const clients = await prisma.client.findMany({
@@ -72,53 +71,23 @@ export async function getDashboardNutritionSnapshot(): Promise<DashboardNutritio
       firstName: true,
       lastName: true,
       category: true,
-      sex: true,
-      dateOfBirth: true,
-      heightCm: true,
       calorieTarget: true,
       proteinTargetG: true,
       carbsTargetG: true,
       fatTargetG: true,
-      assessments: {
-        orderBy: { date: "desc" },
-        take: 1,
-        select: { weightKg: true, activityLevel: true, heightCm: true },
-      },
     },
     orderBy: { createdAt: "asc" },
   });
 
-  const rows: DashboardNutritionRow[] = clients.map((c) => {
-    const a = c.assessments[0];
-    const profile = buildNutritionProfile({
-      weightKg: a?.weightKg != null ? Number(a.weightKg) : null,
-      heightCm:
-        c.heightCm != null
-          ? Number(c.heightCm)
-          : a?.heightCm != null
-            ? Number(a.heightCm)
-            : null,
-      dateOfBirth: c.dateOfBirth,
-      sex: c.sex,
-      activityLevel: a?.activityLevel,
-      goal: c.category,
-    });
-
-    const override = c.calorieTarget !== null;
-    return {
-      id: c.id,
-      name: `${c.firstName} ${c.lastName}`,
-      calories: override ? c.calorieTarget : profile.calorieTarget,
-      proteinG: override ? c.proteinTargetG : profile.proteinG,
-      carbsG: override ? c.carbsTargetG : profile.carbsG,
-      fatG: override ? c.fatTargetG : profile.fatG,
-      ready:
-        (override ? c.calorieTarget : profile.calorieTarget) !== null &&
-        (override ? c.proteinTargetG : profile.proteinG) !== null &&
-        (override ? c.carbsTargetG : profile.carbsG) !== null &&
-        (override ? c.fatTargetG : profile.fatG) !== null,
-    };
-  });
+  const rows: DashboardNutritionRow[] = clients.map((c) => ({
+    id: c.id,
+    name: `${c.firstName} ${c.lastName}`,
+    calories: c.calorieTarget,
+    proteinG: c.proteinTargetG,
+    carbsG: c.carbsTargetG,
+    fatG: c.fatTargetG,
+    ready: c.calorieTarget !== null,
+  }));
 
   const ready = rows.filter((r) => r.ready);
   const avg = (pick: (r: DashboardNutritionRow) => number | null): number | null => {

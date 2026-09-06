@@ -9,7 +9,7 @@ import { CheckInStatusCard } from "@/components/checkin-status-card";
 import { buildNutritionProfile } from "@/lib/nutrition";
 import { formatDate, formatNumber } from "@/lib/utils";
 import { FOLLOWUP_PRIORITY_LABELS, FOLLOWUP_PRIORITY_TONES, SEX_LABELS } from "@/lib/labels";
-import { ClipboardList, MessageSquareText, CalendarClock, Activity } from "lucide-react";
+import { ClipboardList, MessageSquareText, CalendarClock, Activity, Calculator } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -92,25 +92,63 @@ export default async function ClientOverviewPage({
           latestSummary={latestCheckIn?.summary ?? null}
         />
 
-        <NutritionSummary source={nutritionSource} />
+        {client.calorieTarget !== null ? (
+          <>
+            <NutritionSummary source={nutritionSource} />
 
-        <div className="rounded-xl border border-stone-200">
-          <NutritionTargetOverride
-            clientId={client.id}
-            current={{
-              calories: client.calorieTarget,
-              protein: client.proteinTargetG,
-              carbs: client.carbsTargetG,
-              fat: client.fatTargetG,
-            }}
-            calculated={{
-              calories: nutritionProfile.calorieTarget,
-              protein: nutritionProfile.proteinG,
-              carbs: nutritionProfile.carbsG,
-              fat: nutritionProfile.fatG,
-            }}
-          />
-        </div>
+            <div className="rounded-xl border border-stone-200">
+              <NutritionTargetOverride
+                clientId={client.id}
+                current={{
+                  calories: client.calorieTarget,
+                  protein: client.proteinTargetG,
+                  carbs: client.carbsTargetG,
+                  fat: client.fatTargetG,
+                }}
+                calculated={{
+                  calories: nutritionProfile.calorieTarget,
+                  protein: nutritionProfile.proteinG,
+                  carbs: nutritionProfile.carbsG,
+                  fat: nutritionProfile.fatG,
+                }}
+              />
+            </div>
+          </>
+        ) : (
+          <Card>
+            <CardHeader
+              title="Nutrition targets"
+              subtitle="Only you set a client's daily calorie and macro targets."
+            />
+            <div className="px-5 py-5">
+              <p className="text-sm text-stone-600">
+                No nutrition targets set for {client.firstName} yet.
+              </p>
+              <details className="group mt-4">
+                <summary className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-700">
+                  <Calculator className="h-4 w-4" /> Set targets
+                </summary>
+                <div className="mt-4">
+                  <NutritionTargetOverride
+                    clientId={client.id}
+                    current={{
+                      calories: client.calorieTarget,
+                      protein: client.proteinTargetG,
+                      carbs: client.carbsTargetG,
+                      fat: client.fatTargetG,
+                    }}
+                    calculated={{
+                      calories: nutritionProfile.calorieTarget,
+                      protein: nutritionProfile.proteinG,
+                      carbs: nutritionProfile.carbsG,
+                      fat: nutritionProfile.fatG,
+                    }}
+                  />
+                </div>
+              </details>
+            </div>
+          </Card>
+        )}
 
         <Card>
           <CardHeader title="Client details" />

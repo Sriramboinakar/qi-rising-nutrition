@@ -4,7 +4,6 @@ import { PlanForm } from "@/components/plan-form";
 import { PlanActions } from "@/components/plan-actions";
 import { Badge, Card, CardHeader, EmptyState } from "@/components/ui";
 import { PLAN_STATUS_LABELS, PLAN_STATUS_TONES } from "@/lib/labels";
-import { buildNutritionProfile } from "@/lib/nutrition";
 import { formatDate } from "@/lib/utils";
 import { ClipboardList } from "lucide-react";
 
@@ -20,7 +19,6 @@ export default async function PlanPage({
   const client = await prisma.client.findUnique({
     where: { id },
     include: {
-      assessments: { orderBy: { date: "desc" }, take: 1 },
       plans: {
         orderBy: { updatedAt: "desc" },
         include: { meals: { orderBy: { mealOrder: "asc" } } },
@@ -30,28 +28,13 @@ export default async function PlanPage({
 
   if (!client) notFound();
 
-  const latestAssessment = client.assessments[0];
-  const toNum = (v: unknown): number | null => (v === null || v === undefined ? null : Number(v));
-  const profile = buildNutritionProfile({
-    weightKg: toNum(latestAssessment?.weightKg),
-    heightCm:
-      latestAssessment?.heightCm != null
-        ? toNum(latestAssessment.heightCm)
-        : client.heightCm != null
-          ? toNum(client.heightCm)
-          : null,
-    dateOfBirth: client.dateOfBirth,
-    sex: client.sex,
-    activityLevel: latestAssessment?.activityLevel ?? null,
-    goal: client.category,
-  });
-
-  // Effective targets: coach override wins, otherwise the calculated value.
+  // Prefill from the coach-set targets only — calculated estimates are never
+  // used as targets. Fields stay empty until Shevvy sets them.
   const prefill = {
-    calories: client.calorieTarget ?? profile.calorieTarget,
-    protein: client.proteinTargetG ?? profile.proteinG,
-    carbs: client.carbsTargetG ?? profile.carbsG,
-    fat: client.fatTargetG ?? profile.fatG,
+    calories: client.calorieTarget,
+    protein: client.proteinTargetG,
+    carbs: client.carbsTargetG,
+    fat: client.fatTargetG,
   };
 
   return (

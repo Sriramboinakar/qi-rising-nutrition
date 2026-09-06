@@ -19,55 +19,53 @@ export function NutritionTargetOverride({
     null
   );
 
+  const fields = [
+    {
+      id: "calorieTarget",
+      label: "Calories (kcal)",
+      current: current.calories,
+      suggested: calculated.calories,
+    },
+    {
+      id: "proteinTargetG",
+      label: "Protein (g)",
+      current: current.protein,
+      suggested: calculated.protein,
+    },
+    {
+      id: "carbsTargetG",
+      label: "Carbs (g)",
+      current: current.carbs,
+      suggested: calculated.carbs,
+    },
+    {
+      id: "fatTargetG",
+      label: "Fat (g)",
+      current: current.fat,
+      suggested: calculated.fat,
+    },
+  ];
+
   return (
     <form action={action} className="rounded-xl border border-stone-200 bg-stone-50 p-4">
       <div className="mb-3 flex items-center gap-2">
         <Calculator className="h-4 w-4 text-stone-400" />
         <p className="text-sm font-medium text-stone-800">Set custom targets</p>
-        <span className="text-xs text-stone-400">overrides calculated values</span>
+        <span className="text-xs text-stone-400">only what you save counts</span>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div>
-          <Label htmlFor="calorieTarget">Calories (kcal)</Label>
-          <Input
-            id="calorieTarget"
-            name="calorieTarget"
-            type="number"
-            defaultValue={current.calories ?? calculated.calories ?? ""}
-            placeholder={calculated.calories ? `Calc: ${calculated.calories}` : "—"}
-          />
-        </div>
-        <div>
-          <Label htmlFor="proteinTargetG">Protein (g)</Label>
-          <Input
-            id="proteinTargetG"
-            name="proteinTargetG"
-            type="number"
-            defaultValue={current.protein ?? calculated.protein ?? ""}
-            placeholder={calculated.protein ? `Calc: ${calculated.protein}` : "—"}
-          />
-        </div>
-        <div>
-          <Label htmlFor="carbsTargetG">Carbs (g)</Label>
-          <Input
-            id="carbsTargetG"
-            name="carbsTargetG"
-            type="number"
-            defaultValue={current.carbs ?? calculated.carbs ?? ""}
-            placeholder={calculated.carbs ? `Calc: ${calculated.carbs}` : "—"}
-          />
-        </div>
-        <div>
-          <Label htmlFor="fatTargetG">Fat (g)</Label>
-          <Input
-            id="fatTargetG"
-            name="fatTargetG"
-            type="number"
-            defaultValue={current.fat ?? calculated.fat ?? ""}
-            placeholder={calculated.fat ? `Calc: ${calculated.fat}` : "—"}
-          />
-        </div>
+        {fields.map((f) => (
+          <div key={f.id}>
+            <Label htmlFor={f.id}>{f.label}</Label>
+            <Input id={f.id} name={f.id} type="number" defaultValue={f.current ?? ""} placeholder="—" />
+            {f.suggested != null ? (
+              <p className="mt-1 text-[11px] text-stone-400">
+                Suggested based on intake: {f.suggested} — you decide
+              </p>
+            ) : null}
+          </div>
+        ))}
       </div>
 
       {state?.error ? (
