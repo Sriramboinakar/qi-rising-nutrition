@@ -125,7 +125,7 @@ export default async function ClientOverviewPage({
                 No nutrition targets set for {client.firstName} yet.
               </p>
               <details className="group mt-4">
-                <summary className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-700">
+                <summary className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg bg-brand-600 px-4 text-sm font-medium text-white transition-colors hover:bg-brand-700">
                   <Calculator className="h-4 w-4" /> Set targets
                 </summary>
                 <div className="mt-4">

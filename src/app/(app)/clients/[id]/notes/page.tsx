@@ -79,7 +79,7 @@ export default async function NotesPage({
                   >
                     <button
                       type="submit"
-                      className="flex h-7 w-7 items-center justify-center rounded-md text-stone-400 transition-colors hover:bg-white hover:text-amber-600 cursor-pointer"
+                      className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-white hover:text-amber-600 cursor-pointer"
                       aria-label="Toggle pin"
                     >
                       <Pin className="h-4 w-4" />
@@ -93,7 +93,7 @@ export default async function NotesPage({
                   >
                     <button
                       type="submit"
-                      className="flex h-7 w-7 items-center justify-center rounded-md text-stone-400 transition-colors hover:bg-white hover:text-red-600 cursor-pointer"
+                      className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-white hover:text-red-600 cursor-pointer"
                       aria-label="Delete note"
                     >
                       <Trash2 className="h-4 w-4" />

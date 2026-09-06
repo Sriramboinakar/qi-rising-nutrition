@@ -40,12 +40,12 @@ export function CheckInRow({
 
   return (
     <div className="border-b border-stone-100 px-5 py-4 last:border-0">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-stone-900 text-sm font-semibold text-white">
             #{checkIn.weekNumber}
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-medium text-stone-900">{formatDate(checkIn.checkInDate)}</p>
             <p className="text-xs text-stone-500">
               {checkIn.weightKg ? `${formatNumber(Number(checkIn.weightKg))} kg` : ""}
@@ -54,7 +54,7 @@ export function CheckInRow({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {needsReview ? (
             <Badge tone="violet">Needs review</Badge>
           ) : (

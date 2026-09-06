@@ -84,7 +84,7 @@ export function PortalModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-700"
+                className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-700"
                 aria-label="Close dialog"
               >
                 <X className="h-4 w-4" />

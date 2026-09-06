@@ -49,7 +49,7 @@ export function Label({ children, htmlFor, className }: { children: ReactNode; h
 }
 
 const inputBase =
-  "h-10 w-full rounded-lg border bg-white px-3 text-base text-stone-900 placeholder:text-stone-400 shadow-sm transition-all duration-150 focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed sm:text-sm";
+  "h-10 w-full scroll-mt-28 rounded-lg border bg-white px-3 text-base text-stone-900 placeholder:text-stone-400 shadow-sm transition-all duration-150 focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed sm:text-sm";
 
 export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return (

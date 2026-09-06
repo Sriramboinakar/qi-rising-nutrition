@@ -89,7 +89,7 @@ export default async function CheckInsPage({
             <Badge tone="amber">Week {nextWeek}</Badge>
             <button
               type="submit"
-              className="mt-2 inline-flex h-8 items-center rounded-lg bg-stone-900 px-3 text-xs font-medium text-white transition-colors hover:bg-stone-800 cursor-pointer"
+              className="mt-2 inline-flex min-h-11 items-center rounded-lg bg-stone-900 px-3 text-xs font-medium text-white transition-colors hover:bg-stone-800 sm:h-8 sm:min-h-0 cursor-pointer"
             >
               Mark week {nextWeek} as missed
             </button>

@@ -102,7 +102,7 @@ export default async function FollowUpsPage({
                     >
                       <button
                         type="submit"
-                        className="flex h-8 w-8 items-center justify-center rounded-md text-stone-400 transition-colors hover:bg-brand-50 hover:text-brand-600 cursor-pointer"
+                        className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-brand-50 hover:text-brand-600 cursor-pointer"
                         aria-label="Complete follow-up"
                       >
                         <Check className="h-4 w-4" />
@@ -116,7 +116,7 @@ export default async function FollowUpsPage({
                     >
                       <button
                         type="submit"
-                        className="flex h-8 w-8 items-center justify-center rounded-md text-stone-400 transition-colors hover:bg-red-50 hover:text-red-600 cursor-pointer"
+                        className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-red-50 hover:text-red-600 cursor-pointer"
                         aria-label="Delete follow-up"
                       >
                         <Trash2 className="h-4 w-4" />

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { getClientAccessLinks, regenerateClientAccessLink } from "@/lib/actions/intake";
 import { Button, Badge } from "@/components/ui";
 import { PortalModal } from "@/components/portal-modal";
-import { Link2, Copy, Check, RefreshCw } from "lucide-react";
+import { Link2, Copy, Check, RefreshCw, MessageCircle } from "lucide-react";
 import type { AccessPurpose } from "@/lib/access-token";
 
 type LinksState = Awaited<ReturnType<typeof getClientAccessLinks>>;
@@ -155,7 +155,7 @@ export function ClientAccessLinks({ clientId }: { clientId: string }) {
                       <button
                         type="button"
                         onClick={() => copy(row.url!, row.purpose)}
-                        className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-stone-200 hover:text-stone-900"
+                        className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-stone-200 hover:text-stone-900"
                         aria-label={`Copy ${row.label} link`}
                         title={`Copy ${row.label} link`}
                         data-clipboard-text={row.url!}
@@ -169,21 +169,37 @@ export function ClientAccessLinks({ clientId }: { clientId: string }) {
                       <button
                         type="button"
                         onClick={() => rotate(row.purpose)}
-                        className="rounded-md p-1.5 text-stone-400 transition-colors hover:bg-stone-200 hover:text-stone-900"
+                        className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-stone-200 hover:text-stone-900"
                         aria-label={`Regenerate ${row.label} link`}
                         title="Regenerate (old link stops working)"
                       >
-                        <RefreshCw className="h-3.5 w-3.5" />
+                        <RefreshCw className="h-4 w-4" />
                       </button>
                     </>
                   ) : null}
                 </div>
               </div>
             ))}
-            <div className="flex items-center justify-between gap-2 pt-1">
-              <Button variant="ghost" size="sm" onClick={copyMessage}>
-                Copy all links
-              </Button>
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={copyMessage}>
+                  Copy all links
+                </Button>
+                {rows.find((r) => r.purpose === "INTAKE")?.url ? (
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(
+                      `Hi! Please complete your Qi Rising Nutrition intake here — it takes a few minutes: ${
+                        rows.find((r) => r.purpose === "INTAKE")?.url
+                      }`
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-[#25D366] px-3 text-xs font-semibold text-white transition-opacity hover:opacity-90 sm:h-8 sm:min-h-0"
+                  >
+                    <MessageCircle className="h-4 w-4" /> Share on WhatsApp
+                  </a>
+                ) : null}
+              </div>
               <p className="text-xs text-stone-400">Paste into WhatsApp or email</p>
             </div>
           </div>

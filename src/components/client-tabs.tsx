@@ -22,7 +22,7 @@ export function ClientTabs({ clientId }: { clientId: string }) {
   const base = `/clients/${clientId}`;
 
   return (
-    <nav className="flex gap-1 overflow-x-auto rounded-xl border border-stone-200 bg-white p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <nav className="sticky top-14 z-30 -mx-4 flex gap-1 overflow-x-auto border-b border-stone-100 bg-white/95 px-4 pb-1 pt-2 backdrop-blur [-ms-overflow-style:none] [scrollbar-width:none] md:static md:mx-0 md:rounded-xl md:border md:border-stone-200 md:p-1 md:pt-1 [&::-webkit-scrollbar]:hidden">
       {CLIENT_TABS.map((tab) => {
         const active = pathname === `${base}${tab.href}` || (tab.href && pathname.startsWith(`${base}${tab.href}`));
         return (
@@ -30,7 +30,7 @@ export function ClientTabs({ clientId }: { clientId: string }) {
             key={tab.href}
             href={`${base}${tab.href}`}
             className={cn(
-              "relative whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+              "relative flex min-h-11 items-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
               active ? "text-white" : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
             )}
           >

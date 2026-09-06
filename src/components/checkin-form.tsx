@@ -119,13 +119,13 @@ export function CheckInForm({
         </div>
         <div>
           <Label htmlFor="followUpToggle">Follow-up</Label>
-          <div className="flex h-10 items-center gap-2">
+          <div className="flex min-h-11 items-center gap-2 py-1">
             <input
               id="followUpToggle"
               type="checkbox"
               checked={showFollowUp}
               onChange={(e) => setShowFollowUp(e.target.checked)}
-              className="h-4 w-4 rounded border-stone-300 accent-brand-600"
+              className="h-5 w-5 cursor-pointer rounded border-stone-300 accent-brand-600"
             />
             <label htmlFor="followUpToggle" className="text-sm text-stone-600">
               Schedule follow-up

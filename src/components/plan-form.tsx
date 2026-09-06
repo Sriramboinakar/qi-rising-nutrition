@@ -166,7 +166,7 @@ export function PlanForm({
                 <button
                   type="button"
                   onClick={() => setMeals((prev) => prev.filter((_, i) => i !== index))}
-                  className="text-stone-400 transition-colors hover:text-red-600 cursor-pointer"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-red-50 hover:text-red-600 cursor-pointer"
                   aria-label="Remove meal"
                 >
                   <Trash2 className="h-4 w-4" />

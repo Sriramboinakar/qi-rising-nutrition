@@ -120,7 +120,7 @@ export default async function HabitsPage({
                             >
                               <button
                                 type="submit"
-                                className={`mx-auto flex h-6 w-6 items-center justify-center rounded-md border transition-colors cursor-pointer ${
+                                className={`mx-auto flex h-11 w-11 items-center justify-center rounded-lg border transition-colors cursor-pointer ${
                                   done
                                     ? "border-brand-600 bg-brand-600 text-white"
                                     : "border-stone-300 bg-white text-transparent hover:border-brand-400"
