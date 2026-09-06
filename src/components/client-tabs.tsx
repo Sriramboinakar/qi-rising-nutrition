@@ -29,6 +29,7 @@ export function ClientTabs({ clientId }: { clientId: string }) {
           <Link
             key={tab.href}
             href={`${base}${tab.href}`}
+            prefetch
             className={cn(
               "relative flex min-h-11 items-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
               active ? "text-white" : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"

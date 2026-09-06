@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/db";
+import { getUsersForAdmin } from "@/lib/queries/admin";
 import { UserForm } from "@/components/user-form";
 import { UserRow } from "@/components/user-row";
 import { Card, CardHeader, PageHeader } from "@/components/ui";
@@ -13,10 +13,7 @@ export default async function UsersPage() {
   if (!session?.user) redirect("/login");
   if (session.user.role !== "SUPER_ADMIN") redirect("/dashboard");
 
-  const users = await prisma.user.findMany({
-    orderBy: [{ role: "desc" }, { name: "asc" }],
-    select: { id: true, name: true, email: true, role: true, isActive: true },
-  });
+  const users = await getUsersForAdmin();
 
   return (
     <StaggerChildren stagger={0.05} className="space-y-6">

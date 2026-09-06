@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/db";
+import { getSettingsForAdmin } from "@/lib/queries/admin";
 import { Button, Card, CardHeader, Input, Label, PageHeader } from "@/components/ui";
 import { saveSettings } from "@/lib/actions/settings";
 import { TestDataCleanup } from "@/components/test-data-cleanup";
@@ -21,7 +21,7 @@ export default async function SettingsPage() {
   if (!session?.user) redirect("/login");
   if (session.user.role !== "SUPER_ADMIN") redirect("/dashboard");
 
-  const settings = await prisma.setting.findMany();
+  const settings = await getSettingsForAdmin();
   const settingsMap = new Map(settings.map((s) => [s.key, s.value]));
 
   return (

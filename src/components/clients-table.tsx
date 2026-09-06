@@ -159,7 +159,7 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
                   />
                 </td>
                 <td className="px-5 py-3">
-                  <Link href={`/clients/${client.id}`} className="flex min-h-11 items-center gap-3">
+                  <Link href={`/clients/${client.id}`} prefetch className="flex min-h-11 items-center gap-3">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700">
                       {initials(client.firstName, client.lastName)}
                     </div>
@@ -196,6 +196,7 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
             <li key={client.id} className="relative px-4 py-4">
               <Link
                 href={`/clients/${client.id}`}
+                prefetch
                 className="absolute inset-0"
                 aria-label={`Open ${name}`}
               />

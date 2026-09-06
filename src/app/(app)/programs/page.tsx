@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/db";
 import { ProgramForm } from "@/components/program-form";
+import { getProgramsForAdmin } from "@/lib/queries/admin";
 import { Badge, Card, CardHeader, PageHeader } from "@/components/ui";
 import { StaggerChildren } from "@/components/stagger-children";
 import { CalendarRange } from "lucide-react";
@@ -7,10 +7,7 @@ import { CalendarRange } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function ProgramsPage() {
-  const programs = await prisma.program.findMany({
-    orderBy: { createdAt: "asc" },
-    include: { _count: { select: { clients: true } } },
-  });
+  const programs = await getProgramsForAdmin();
 
   return (
     <StaggerChildren stagger={0.05} className="space-y-6">

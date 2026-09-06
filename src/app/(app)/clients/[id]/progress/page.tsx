@@ -103,6 +103,8 @@ export default async function ProgressPage({
                     <img
                       src={photo.url}
                       alt={`${PHOTO_TYPE_LABELS[photo.type]} photo`}
+                      loading="lazy"
+                      decoding="async"
                       className="h-full w-full object-cover transition-transform group-hover:scale-105"
                     />
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-2">
