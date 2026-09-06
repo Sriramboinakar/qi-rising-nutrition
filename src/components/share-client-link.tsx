@@ -47,7 +47,7 @@ export function ShareClientLink({ clientId }: { clientId: string }) {
       <button
         type="button"
         onClick={openDialog}
-        className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg bg-brand-50 px-3 text-xs font-medium text-brand-700 transition-colors hover:bg-brand-100"
+        className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-lg bg-brand-50 px-3 text-xs font-medium text-brand-700 transition-colors hover:bg-brand-100 sm:h-8 sm:min-h-0"
         aria-haspopup="dialog"
         aria-expanded={open}
       >

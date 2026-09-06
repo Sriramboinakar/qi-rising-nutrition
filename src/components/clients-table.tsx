@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { bulkDeleteClients } from "@/lib/actions/clients";
@@ -10,18 +10,27 @@ import { PortalModal } from "@/components/portal-modal";
 import { ShareClientLink } from "@/components/share-client-link";
 import { CLIENT_STATUS_LABELS, CLIENT_STATUS_TONES, GOAL_CATEGORY_LABELS } from "@/lib/labels";
 import { fullName, initials } from "@/lib/utils";
-import { Trash2, ShieldAlert } from "lucide-react";
+import { Trash2, ShieldAlert, MessageCircle } from "lucide-react";
 
 export type ClientRow = {
   id: string;
   firstName: string;
   lastName: string;
   email: string | null;
+  phone: string | null;
   category: string;
   status: string;
   programName: string | null;
   lastCheckInLabel: string;
 };
+
+const PAGE_SIZE = 25;
+
+function whatsappHref(client: ClientRow): string {
+  const msg = `Hi ${client.firstName || "there"}! Quick check-in from Qi Rising Nutrition.`;
+  const digits = (client.phone ?? "").replace(/\D/g, "");
+  return `https://wa.me/${digits}?text=${encodeURIComponent(msg)}`;
+}
 
 export function ClientsTable({ clients }: { clients: ClientRow[] }) {
   const router = useRouter();
@@ -29,9 +38,17 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [visible, setVisible] = useState(PAGE_SIZE);
+
+  useEffect(() => {
+    setSelected(new Set());
+    setVisible(PAGE_SIZE);
+  }, [clients]);
 
   const testCount = clients.filter((c) => isTestClientEmail(c.email)).length;
   const allChecked = clients.length > 0 && selected.size === clients.length;
+  const shown = clients.slice(0, visible);
+  const hasMore = clients.length > visible;
 
   function toggle(id: string) {
     setSelected((prev) => {
@@ -98,17 +115,18 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
         </div>
       ) : null}
 
-      <div className="overflow-x-auto">
+      {/* Desktop table */}
+      <div className="hidden overflow-x-auto sm:block">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-stone-100 text-left text-xs uppercase tracking-wide text-stone-400">
-              <th className="w-10 px-5 py-3">
+              <th className="w-12 px-5 py-3">
                 <input
                   type="checkbox"
                   checked={allChecked}
                   onChange={toggleAll}
                   aria-label="Select all clients"
-                  className="h-4 w-4 cursor-pointer accent-emerald-600"
+                  className="h-5 w-5 cursor-pointer accent-emerald-600"
                 />
               </th>
               <th className="px-5 py-3 font-medium">Client</th>
@@ -120,7 +138,7 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-50">
-            {clients.map((client) => (
+            {shown.map((client) => (
               <tr key={client.id} className="transition-colors hover:bg-stone-50">
                 <td className="px-5 py-3">
                   <input
@@ -128,11 +146,11 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
                     checked={selected.has(client.id)}
                     onChange={() => toggle(client.id)}
                     aria-label={`Select ${fullName(client.firstName, client.lastName)}`}
-                    className="h-4 w-4 cursor-pointer accent-emerald-600"
+                    className="h-5 w-5 cursor-pointer accent-emerald-600"
                   />
                 </td>
                 <td className="px-5 py-3">
-                  <Link href={`/clients/${client.id}`} className="flex items-center gap-3">
+                  <Link href={`/clients/${client.id}`} className="flex min-h-11 items-center gap-3">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700">
                       {initials(client.firstName, client.lastName)}
                     </div>
@@ -160,6 +178,70 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
           </tbody>
         </table>
       </div>
+
+      {/* Mobile stacked cards */}
+      <ul className="divide-y divide-stone-100 sm:hidden">
+        {shown.map((client) => {
+          const name = fullName(client.firstName, client.lastName);
+          return (
+            <li key={client.id} className="relative px-4 py-4">
+              <Link
+                href={`/clients/${client.id}`}
+                className="absolute inset-0"
+                aria-label={`Open ${name}`}
+              />
+              <div className="relative flex items-center gap-3">
+                <label className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center">
+                  <input
+                    type="checkbox"
+                    checked={selected.has(client.id)}
+                    onChange={() => toggle(client.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label={`Select ${name}`}
+                    className="h-5 w-5 cursor-pointer accent-emerald-600"
+                  />
+                </label>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="truncate text-sm font-semibold text-stone-900">{name}</p>
+                    <Badge tone={CLIENT_STATUS_TONES[client.status]}>
+                      {CLIENT_STATUS_LABELS[client.status]}
+                    </Badge>
+                  </div>
+                  <p className="mt-0.5 truncate text-xs text-stone-500">
+                    {client.lastCheckInLabel === "Never"
+                      ? "No check-ins yet"
+                      : `Last check-in: ${client.lastCheckInLabel}`}
+                  </p>
+                </div>
+                <a
+                  href={whatsappHref(client)}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-white"
+                  aria-label={`WhatsApp ${name}`}
+                >
+                  <MessageCircle className="h-5 w-5" />
+                </a>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {hasMore ? (
+        <div className="flex justify-center px-5 py-4">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setVisible((v) => v + PAGE_SIZE)}
+          >
+            Load more ({clients.length - visible} more)
+          </Button>
+        </div>
+      ) : null}
 
       <PortalModal
         open={confirmOpen}
